@@ -1,0 +1,20 @@
+100??abcd
+600??abcd
+700??abcd
+## Examples :
+##100 with 1st ind = 4, 2nd ind = 0 and only field a
+#10040a
+##100 with 1st ind = 1, 2nd ind = ' ' and fields a and d
+#1001 ad
+##245 with both indicators = ' ' and all subfields
+#245  *
+##tags 110 to 119, 1st ind = 1 2nd ind = 0 and subfields abcd
+#11X10abcd = tags 110 111 klp
+##110 any indicator and a & b subfields
+#110??ab = all indicators
+##Everything
+#XXX??* = everything
+##other examples
+#110??ab
+#710??ab
+#X10??ab

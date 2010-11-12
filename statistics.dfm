@@ -1,0 +1,129 @@
+object statisticsForm: TstatisticsForm
+  Left = 283
+  Top = 141
+  Width = 670
+  Height = 640
+  Caption = 'Statistics'
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = False
+  OnActivate = FormActivate
+  OnKeyPress = FormKeyPress
+  DesignSize = (
+    662
+    606)
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Label2: TLabel
+    Left = 8
+    Top = 8
+    Width = 28
+    Height = 13
+    Caption = 'From'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label3: TLabel
+    Left = 8
+    Top = 48
+    Width = 16
+    Height = 13
+    Caption = 'To'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object stat_results: TTntStringGrid
+    Left = 0
+    Top = 112
+    Width = 657
+    Height = 489
+    TabStop = False
+    DefaultRowHeight = 16
+    FixedColor = clMedGray
+    RowCount = 28
+    Font.Charset = GREEK_CHARSET
+    Font.Color = clActiveCaption
+    Font.Height = 14
+    Font.Name = 'Arial'
+    Font.Style = [fsBold]
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
+    ParentFont = False
+    ScrollBars = ssNone
+    TabOrder = 0
+    OnDrawCell = stat_resultsDrawCell
+    ColWidths = (
+      31
+      324
+      97
+      99
+      96)
+  end
+  object DateTimePicker2: TDateTimePicker
+    Left = 57
+    Top = 48
+    Width = 136
+    Height = 21
+    Anchors = [akTop, akRight]
+    Date = 0.499304641220078300
+    Format = 'dd-MM-yyyy'
+    Time = 0.499304641220078300
+    ShowCheckbox = True
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 1
+  end
+  object DateTimePicker1: TDateTimePicker
+    Left = 57
+    Top = 8
+    Width = 136
+    Height = 21
+    Anchors = [akTop, akRight]
+    Date = 0.499304641220078300
+    Format = 'dd-MM-yyyy'
+    Time = 0.499304641220078300
+    ShowCheckbox = True
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 2
+  end
+  object BitBtn1: TBitBtn
+    Left = 264
+    Top = 8
+    Width = 145
+    Height = 73
+    Caption = 'Go'
+    TabOrder = 3
+    OnClick = BitBtn1Click
+  end
+  object BitBtn2: TBitBtn
+    Left = 424
+    Top = 8
+    Width = 145
+    Height = 73
+    Caption = 'Save'
+    TabOrder = 4
+    Visible = False
+    OnClick = BitBtn2Click
+  end
+end

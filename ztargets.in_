@@ -1,0 +1,197 @@
+[Zgroups]
+Greek MARC21=01,14,18
+Greek UNIMARC=03,04,05,17,19
+Non Greek MARC21=02,06,07,08,09,10,11,12,13,15,16,21,22,23,25,20,26
+Non Greek UNIMARC=24
+[00]
+name=test
+zurl=localhost:9999/journals
+proxy=
+format=USMARC
+scharset=Win-1253
+dcharset=Win-1253
+[01]
+name=Aristoteleio Thessalonikis
+zurl=zserver.lib.auth.gr:210/AUTH_LIBRARY
+proxy=147.52.108.92:9094
+format=USMARC
+scharset=Win-1253
+dcharset=iso5428
+[02]
+name=NLC
+zurl=amicus.collectionscanada.ca:210/NL
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=LATIN1
+dcharset=LATIN1
+[03]
+name=Cyprus
+zurl=194.42.4.129:210/ADVANCE
+proxy=zephyr.lib.uoc.gr:9002
+format=UNIMARC
+scharset=advance
+dcharset=advance
+[04]
+name=Thraki
+zurl=central.lib.duth.gr:211/ADVANCE
+proxy=147.52.108.92:9094
+format=UNIMARC
+scharset=advance
+dcharset=advance
+[05]
+name=Panteion
+zurl=library.panteion.gr:210/ADVANCE
+proxy=147.52.108.92:9094
+format=UNIMARC
+scharset=advance
+dcharset=advance
+[06]
+name=NLA
+zurl=catalogue.nla.gov.au:7090/Voyager
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=LATIN1
+dcharset=LATIN1
+[07]
+name=Melvyl Union Catalogue
+zurl=melvyl.ucop.edu:210/CDL90
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=UTF8
+dcharset=UTF8
+[08]
+name=Princeton University
+zurl=catalog.princeton.edu:7090/Voyager
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=LATIN1
+dcharset=UTF8
+[09]
+name=Library of Congress
+zurl=z3950.loc.gov:7090/Voyager
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=LATIN1
+dcharset=MARC8s
+[10]
+name=Yale University
+zurl=prodorbis.library.yale.edu:7090/Voyager
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=LATIN1
+dcharset=LATIN1
+[11]
+name=Columbia University
+zurl=clio-db.cc.columbia.edu:7090/Voyager
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=LATIN1
+dcharset=LATIN1
+[12]
+name=New York Public Library
+zurl=catalog.nypl.org:210/INNOPAC
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=LATIN1
+dcharset=LATIN1
+[13]
+name=Worldcat - OCLC
+zurl=fsz3950.oclc.org:210/OLUC
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=LATIN1
+dcharset=LATIN1
+[14]
+name=Macedonia
+zurl=195.251.214.68:210/UOM_LIBRARY
+proxy=147.52.108.92:9094
+format=USMARC
+scharset=Win-1253
+dcharset=iso5428
+[15]
+name=National Library of Sweden
+zurl=z3950.libris.kb.se:210/libr
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=LATIN1
+dcharset=LATIN1
+[16]
+name=Russian State Library
+zurl=aleph.rsl.ru:9909/rsl01
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=UTF8
+dcharset=UTF8
+[17]
+name=Panmio Athinon
+zurl=195.134.90.84:210/UOA_LIBRARY
+proxy=147.52.108.92:9094
+format=UNIMARC
+scharset=Win-1253
+dcharset=iso5428
+[18]
+name=Kriti - ALEPH
+zurl=zeus.lib.uoc.gr:9991/uoc01
+proxy=147.52.108.92:9094
+format=USMARC
+scharset=UTF8
+dcharset=UTF8
+[19]
+name=Ethniki Bibliothiki
+zurl=195.134.102.45:210/NLG_LIBRARY
+proxy=147.52.108.92:9094
+format=UNIMARC
+scharset=Win-1253
+dcharset=Win-1253
+[20]
+name=Hollis
+zurl=195.251.104.98:9002/hollis
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=UTF8
+dcharset=UTF8
+[21]
+name=SWB
+zurl=193.197.31.30:210/swblite
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=LATIN1
+dcharset=LATIN1
+[22]
+name=HEBIS
+zurl=tolk.hebis.de:210/hebis
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=LATIN1
+dcharset=LATIN1
+[23]
+name=SBN
+zurl=opac.sbn.it:3950/nopac
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=LATIN1
+dcharset=LATIN1
+[24]
+name=BNF
+zurl=z3950.bnf.fr:2211/TOUT
+proxy=195.251.104.98:9001
+format=UNIMARC
+scharset=LATIN1
+dcharset=ISO5426
+userid=Z3950
+password=Z3950_BNF
+[25]
+name=Ambrosia
+zurl=ambrosia.ascsa.edu.gr:9991/bbg01
+proxy=195.251.104.98:9001
+format=OPAC
+scharset=UTF8
+dcharset=UTF8
+[26]
+name=Zenon DAI
+zurl=opac.dainst.org:9992/DAI01
+proxy=195.251.104.98:9001
+format=USMARC
+scharset=UTF8
+dcharset=UTF8
+

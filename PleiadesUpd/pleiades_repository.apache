@@ -1,0 +1,6 @@
+Alias /pleiades_repository /data/Library/Shared/bin
+
+<Directory /data/Library/Shared/bin>
+   Options FollowSymLinks
+   AllowOverride None
+</Directory>
