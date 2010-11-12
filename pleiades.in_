@@ -1,0 +1,59 @@
+[FastRecordCreator]
+databases=pleiades
+defaultdatabase=pleiades
+Languages=gre,eng,grc,ger,lat,ita,fre
+Materials=bk,se,am,mu,ma,cp,vm,mp
+greek_charset=ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩΆΈΉΊΌΎΏΪΫαβγδεζηθικλμνξοπρστυφχψωςάέήίόύώϊϋΐΰ
+
+[Enumeration]
+1=vol.
+2=no.
+3=sect.
+4=pt.
+5=series.
+6=
+
+[Chronology]
+1=year
+2=month
+3=day
+4=season
+
+[RecordLevel]
+0=New
+1=New - Not In Blegen
+2=New - Other Cln
+3=Completed
+4=Completed - Not In Blegen
+5=Completed - Other Cln
+
+[LoanCategory]
+0=Not for loan
+
+[ProcessStatus]
+0=In Library
+1=On Order
+2=In Process
+3=Binding
+4=Lost
+
+[AuthRecordLevel]
+0=New
+1=Completed
+
+[pleiades]
+OrgCode=GR-AtAS
+DefCln=
+myzhost=192.168.1.68
+myzport=210
+myzdatabase=pleiades
+myzdommode=0
+myzauthhost=192.168.1.68
+myzauthport=9005
+myzauthdatabase=pleiades_auth
+myzauthdommode=0
+mysqlhost=192.168.1.68
+mysqlport=3306
+mysqldb=pleiades
+mysqluser=secret
+mysqlpass=secret
