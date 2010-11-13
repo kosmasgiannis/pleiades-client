@@ -1,3 +1,6 @@
+*.~*
+*.ddp
+*.dcu
 *.ttf
 *.exe
 *.dll
