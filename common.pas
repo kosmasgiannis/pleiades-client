@@ -437,7 +437,7 @@ begin
  end;
 end;
 
-function mksyntax(tag,subfields:string; var msg:string; var UsmarcStx : array of syntaxrec):boolean;
+function mksyntax(tag,subfields:widestring; var msg:string; var UsmarcStx : array of syntaxrec):boolean;
 var idx,j,k:integer;
     t:boolean;
 begin
@@ -485,7 +485,7 @@ begin
 end;
 
 function syntaxchk(lines : TTntStringlist; var msg : string; var UsmarcStx : array of syntaxrec):boolean;
-var i,l,k: integer;
+var i,l,k,x: integer;
     foo,tag,subfields:WideString;
 begin
  msg:='';
@@ -522,6 +522,15 @@ begin
   for l:=1 to length(Lines[i]) do
    if (Lines[i][l] = '$') then
     subfields:=subfields+Lines[i][l+1];
+  for x :=1 to length(subfields) do
+  begin
+    if (pos(subfields[x], 'abcdefghijklmnopqrstuvwxyz0123456789') <= 0) then
+    begin
+      msg:=msg+'['+tag+'] has invalid subfields.'+#10#13;
+      result:=false;
+      break;
+    end;
+  end;
   if (not mksyntax(tag,subfields,msg,UsmarcStx)) then result:=false;
  end;
  for i:=0 to 1000 do
