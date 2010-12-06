@@ -42,8 +42,8 @@ ZOOM_HOST = record
      end;
 
 subfieldrec = record
-      subfield : char;
-      repeatable : char;
+      subfield : widechar;
+      repeatable : widechar;
       occ:array[1..512] of integer;
       end;
 
@@ -51,8 +51,8 @@ Psyntaxrec = ^syntaxrec;
 
 syntaxrec = record
       tag: string;
-      repeatable : char;
-      mandatory : char;
+      repeatable : widechar;
+      mandatory : widechar;
       occ : integer;
       subfieldcnt:integer;
       subfields : array [1..36] of subfieldrec;
@@ -377,7 +377,8 @@ end;
 
 procedure loadsyntaxdef(syntaxfiledef : string; var UsmarcStx : array of syntaxrec);
 var f : textfile;
-    rec,subfields,url : string;
+    subfields,
+    rec, url : widestring;
     idx,i:integer;
 begin
   for i:=0 to 1000 do
