@@ -322,7 +322,7 @@ begin
    begin
    if (azoomhost.dcharset <> 'UTF8') then
 //    type_spec1:='xml; charset='+azoomhost.dcharset+',utf8'
-    type_spec1:='raw;charset='+azoomhost.dcharset+',utf8'
+    type_spec1:='raw;charset='+azoomhost.dcharset+',utf-8'
    else
     type_spec1:='raw';
    end;
