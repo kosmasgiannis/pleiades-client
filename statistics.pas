@@ -23,7 +23,7 @@ type
     procedure BitBtn2Click(Sender: TObject);
   private
     { Private declarations }
-    function makequery(tab:string; which : integer):string;
+    function makequery(tab, cmtype:string; which : integer):string;
   public
     { Public declarations }
   end;
@@ -31,7 +31,7 @@ type
   stat_rec = record
       usercode : integer;
       username : widestring;
-      sb, si: integer;
+      scb, sci, smb, smi: integer;
   end;
 
 var
@@ -60,8 +60,10 @@ begin
       b:=b+1;
       user_stat[b].usercode:=Fields[0].AsInteger;
       user_stat[b].username:=Fields[1].AsString;
-      user_stat[b].sb:=0;
-      user_stat[b].si:=0;
+      user_stat[b].scb:=0;
+      user_stat[b].sci:=0;
+      user_stat[b].smb:=0;
+      user_stat[b].smi:=0;
       Next;
     end;
   end;
@@ -69,28 +71,44 @@ begin
   result:=b;
 end;
 
-procedure update_user_stat(usercode : integer; key:string; value:integer);
+procedure update_user_stat(usercode : integer; key, cmtype:string; value:integer);
 var i : integer;
 begin
   for i:=1 to user_stat_dim do
   begin
     if user_stat[i].usercode = usercode then
     begin
-      if key = 'bib' then user_stat[i].sb:=value
-      else if key = 'item' then user_stat[i].si := value;
+      if (cmtype = 'c') then
+      begin
+        if key = 'bib' then user_stat[i].scb:=value
+        else if key = 'item' then user_stat[i].sci := value;
+      end
+      else
+      begin
+        if key = 'bib' then user_stat[i].smb:=value
+        else if key = 'item' then user_stat[i].smi := value;
+      end;
       break;
     end;
   end;
 end;
 
-function TstatisticsForm.makequery(tab:string; which : integer):string;
+function TstatisticsForm.makequery(tab, cmtype:string; which : integer):string;
 var  s, dd: string;
      todadat : TDate;
      TempDateFormat : string;
 begin
   result := '';
-  if tab = 'basket' then dd := 'created'
-  else dd := 'datecreated';
+  if tab = 'basket' then
+  begin
+    if cmtype = 'c' then dd := 'created'
+    else dd := 'modified';
+  end
+  else
+  begin
+    if cmtype = 'c' then dd := 'datecreated'
+    else dd := 'datemodified';
+  end;
   TempDateFormat := ShortDateFormat;
   ShortDateFormat := 'yyyy-mm-dd';
   if which = 1 then
@@ -117,19 +135,21 @@ begin
 end;
 
 procedure TstatisticsForm.BitBtn1Click(Sender: TObject);
-var  nod, sb,si, b, e : integer;
+var  nod, scb,sci, smb, smi, b, e : integer;
 x : TRect;
 begin
   Clear_String_Grid(stat_results);
   load_users;
-  sb:=0;
-  si:=0;
+  scb:=0;
+  sci:=0;
+  smb:=0;
+  smi:=0;
   nod := 0;
   with data.query1 do
   begin
     Close;
     SQL.Clear;
-    SQL.Add(makequery('basket',2));
+    SQL.Add(makequery('basket','c',2));
     Execute;
     First;
     while not Eof do
@@ -143,49 +163,79 @@ begin
   begin
     Close;
     SQL.Clear;
-    SQL.Add(makequery('basket',1));
+    SQL.Add(makequery('basket','c',1));
     //showmessage(sql.Text);
     Execute;
     First;
     while not Eof do
     begin
-      update_user_stat(Fields[1].AsInteger, 'bib', Fields[0].AsInteger);
-      sb:=sb+Fields[0].asinteger;
+      update_user_stat(Fields[1].AsInteger, 'bib', 'c', Fields[0].AsInteger);
+      scb:=scb+Fields[0].asinteger;
       Next;
     end;
     Close;
     SQL.Clear;
-    SQL.Add(makequery('items',1));
+    SQL.Add(makequery('items','c',1));
     //showmessage(sql.Text);
     Execute;
     First;
     while not Eof do
     begin
-      update_user_stat(Fields[1].AsInteger, 'item', Fields[0].AsInteger);
-      si:=si+Fields[0].asinteger;
+      update_user_stat(Fields[1].AsInteger, 'item', 'c', Fields[0].AsInteger);
+      sci:=sci+Fields[0].asinteger;
       Next;
     end;
 
+    Close;
+    SQL.Clear;
+    SQL.Add(makequery('basket','m',1));
+    //showmessage(sql.Text);
+    Execute;
+    First;
+    while not Eof do
+    begin
+      update_user_stat(Fields[1].AsInteger, 'bib', 'm', Fields[0].AsInteger);
+      smb:=smb+Fields[0].asinteger;
+      Next;
+    end;
+    Close;
+    SQL.Clear;
+    SQL.Add(makequery('items','m',1));
+    //showmessage(sql.Text);
+    Execute;
+    First;
+    while not Eof do
+    begin
+      update_user_stat(Fields[1].AsInteger, 'item', 'm', Fields[0].AsInteger);
+      smi:=smi+Fields[0].asinteger;
+      Next;
+    end;
     stat_results.Cells[0,1] :=' ';
     stat_results.Cells[1,1] :='Total';
-    stat_results.Cells[2,1] :=inttostr(sb);
-    stat_results.Cells[3,1] :=inttostr(si);
+    stat_results.Cells[2,1] :=inttostr(scb);
+    stat_results.Cells[3,1] :=inttostr(sci);
+    stat_results.Cells[4,1] :=inttostr(smb);
+    stat_results.Cells[5,1] :=inttostr(smi);
     if (nod > 0) then
     begin
       stat_results.Cells[0,2] :=' ';
       stat_results.Cells[1,2] :='Average in '+inttostr(nod)+' days';
-      stat_results.Cells[2,2] :=inttostr(sb div nod);
-      stat_results.Cells[3,2] :=inttostr(si div nod);
+      stat_results.Cells[2,2] :=inttostr(scb div nod);
+      stat_results.Cells[3,2] :=inttostr(sci div nod);
+      stat_results.Cells[4,2] :=inttostr(smb div nod);
+      stat_results.Cells[5,2] :=inttostr(smi div nod);
     end;
     e:=3;
     for b:=1 to user_stat_dim do
     begin
-      if (( user_stat[b].sb <> 0) or (user_stat[b].si <> 0)) then
+      if (( user_stat[b].scb <> 0) or (user_stat[b].sci <> 0)) then
       begin
         stat_results.Cells[0,e] :=inttostr(e-2);
         stat_results.Cells[1,e] :=user_stat[b].username;
-        stat_results.Cells[2,e] :=inttostr(user_stat[b].sb);
-        stat_results.Cells[3,e] :=inttostr(user_stat[b].si);
+        stat_results.Cells[2,e] :=inttostr(user_stat[b].scb);
+        stat_results.Cells[3,e] :=inttostr(user_stat[b].sci);
+        stat_results.Cells[4,e] :=inttostr(user_stat[b].smb);
+        stat_results.Cells[5,e] :=inttostr(user_stat[b].smi);
         x := stat_results.CellRect(2,e);
         e:=e+1;
       end;
@@ -201,8 +251,10 @@ begin
     Clear_String_Grid(stat_results);
     stat_results.Cells[0,0] := '#';
     stat_results.Cells[1,0] := 'UserName';
-    stat_results.Cells[2,0] := 'Bibliographic';
-    stat_results.Cells[3,0] := 'Items';
+    stat_results.Cells[2,0] := 'Bibliographic New';
+    stat_results.Cells[3,0] := 'Items New';
+    stat_results.Cells[4,0] := 'Bibliographic Modified';
+    stat_results.Cells[5,0] := 'Items Modified';
     bitbtn2.Enabled := false;
 end;
 
@@ -259,14 +311,14 @@ begin
     Display(stat_results, stat_results.Cells[ACol, ARow], taCenter, CLBLUE, bgcolor)
  else if ARow in  [1..2] then
  begin
-    if ACol in [2..3] then
+    if ACol in [2..5] then
        Display(stat_results, stat_results.Cells[ACol, ARow], taRightJustify, ClRed, bgcolor)
     else
        Display(stat_results, stat_results.Cells[ACol, ARow], taLeftJustify, ClRed,bgcolor)
  end
  else
  begin
-   if ACol in [2..3] then
+   if ACol in [2..5] then
       Display(stat_results, stat_results.Cells[ACol, ARow], taRightJustify, ClGreen,bgcolor)
    else
       Display(stat_results, stat_results.Cells[ACol, ARow], taLeftJustify, ClOlive,bgcolor);
@@ -281,7 +333,6 @@ end;
 procedure TstatisticsForm.BitBtn2Click(Sender: TObject);
 var F : TextFile;
 begin
-//
 with fastrecordcreator do
 begin
     SaveDialog1.FileName := '';

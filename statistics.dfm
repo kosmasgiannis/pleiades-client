@@ -1,7 +1,7 @@
 object statisticsForm: TstatisticsForm
-  Left = 283
+  Left = 235
   Top = 141
-  Width = 670
+  Width = 942
   Height = 640
   Caption = 'Statistics'
   Color = clBtnFace
@@ -15,8 +15,8 @@ object statisticsForm: TstatisticsForm
   OnActivate = FormActivate
   OnKeyPress = FormKeyPress
   DesignSize = (
-    662
-    606)
+    934
+    613)
   PixelsPerInch = 96
   TextHeight = 13
   object Label2: TLabel
@@ -48,9 +48,10 @@ object statisticsForm: TstatisticsForm
   object stat_results: TTntStringGrid
     Left = 0
     Top = 112
-    Width = 657
+    Width = 929
     Height = 489
     TabStop = False
+    ColCount = 6
     DefaultRowHeight = 16
     FixedColor = clMedGray
     RowCount = 28
@@ -66,10 +67,11 @@ object statisticsForm: TstatisticsForm
     OnDrawCell = stat_resultsDrawCell
     ColWidths = (
       31
-      324
-      97
-      99
-      96)
+      301
+      140
+      155
+      146
+      149)
   end
   object DateTimePicker2: TDateTimePicker
     Left = 57
@@ -108,7 +110,7 @@ object statisticsForm: TstatisticsForm
     TabOrder = 2
   end
   object BitBtn1: TBitBtn
-    Left = 264
+    Left = 256
     Top = 8
     Width = 145
     Height = 73
