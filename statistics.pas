@@ -112,7 +112,11 @@ begin
   TempDateFormat := ShortDateFormat;
   ShortDateFormat := 'yyyy-mm-dd';
   if which = 1 then
-    s := ' WHERE users.usercode='+tab+'.creator '
+  begin
+    s := ' WHERE users.usercode='+tab;
+    if cmtype = 'c' then s:= s+'.creator '
+    else s:=s+'.modifier';
+  end
   else
     s := ' WHERE 1=1';
 
@@ -129,7 +133,12 @@ begin
   end;
 
   if which = 1 then
-    result := 'SELECT count('+tab+'.recno), users.usercode, concat(users.userfirstname," ", users.userlastname) FROM users, '+tab+' ' + s+' Group by '+tab+'.creator'
+  begin
+    if cmtype = 'c' then
+      result := 'SELECT count('+tab+'.recno), users.usercode, concat(users.userfirstname," ", users.userlastname) FROM users, '+tab+' ' + s+' Group by '+tab+'.creator'
+    else
+      result := 'SELECT count('+tab+'.recno), users.usercode, concat(users.userfirstname," ", users.userlastname) FROM users, '+tab+' ' + s+' Group by '+tab+'.modifier'
+  end
   else
     result := 'SELECT count(distinct '+dd+') FROM '+tab+' ' + s;
 end;
@@ -228,7 +237,7 @@ begin
     e:=3;
     for b:=1 to user_stat_dim do
     begin
-      if (( user_stat[b].scb <> 0) or (user_stat[b].sci <> 0)) then
+      if (( user_stat[b].scb <> 0) or (user_stat[b].sci <> 0) or ( user_stat[b].smb <> 0) or (user_stat[b].smi <> 0)) then
       begin
         stat_results.Cells[0,e] :=inttostr(e-2);
         stat_results.Cells[1,e] :=user_stat[b].username;
