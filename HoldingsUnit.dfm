@@ -1,6 +1,6 @@
 object Holdings: THoldings
-  Left = 434
-  Top = 198
+  Left = 482
+  Top = 189
   BorderStyle = bsDialog
   Caption = 'Holdings Info'
   ClientHeight = 732

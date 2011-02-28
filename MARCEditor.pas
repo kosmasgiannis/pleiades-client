@@ -429,6 +429,12 @@ end;
 procedure TMARCEditorform.MakeEdit;
 begin
 
+if ((current_user_access = 6) and (UserCode <> Data.securebasket.FieldByName('creator').AsInteger) ) then
+begin
+  WideShowMessage('You do not have permission to modify this record.');
+end
+else
+begin
   if take_lock Then
   begin
     full.ReadOnly := False;
@@ -443,7 +449,7 @@ begin
   end
   Else
   ShowMessage('This record is being edited by another user');
-
+end;
 end;
 
 procedure TMARCEditorform.MakeReadOnly;
@@ -467,6 +473,13 @@ end;
 
 procedure TMARCEditorform.NewClick(Sender: TObject);
 begin
+if ((current_user_access = 6) and (UserCode <> Data.securebasket.FieldByName('creator').AsInteger) ) then
+begin
+  WideShowMessage('You do not have permission to add holdings for this record.');
+end
+else
+begin
+
   if (SyntaxCheck(full.Lines,'bib') <> true) then
   begin
     showmessage('There are syntax errors. Please correct them first.');
@@ -489,7 +502,7 @@ begin
   end;
 
   SetHoldInRichEdit(TntRichEditME);
-
+end;
 end;
 
 
@@ -1336,6 +1349,12 @@ end;
 
 procedure TMARCEditorform.TntBitBtn4Click(Sender: TObject);
 begin
+ if ((current_user_access = 6) and (UserCode <> Data.securebasket.FieldByName('creator').AsInteger) ) then
+ begin
+  WideShowMessage('You do not have permission to add holdings for this record.');
+ end
+ else
+ begin
   if (SyntaxCheck(full.Lines,'bib') <> true) then
   begin
     showmessage('There are syntax errors. Please correct them first.');
@@ -1343,6 +1362,7 @@ begin
   end;
   HoldingsRange.ShowModal;
   SetHoldInRichEdit(TntRichEditME);
+ end;
 end;
 
 end.

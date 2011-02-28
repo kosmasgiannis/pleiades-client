@@ -98,8 +98,8 @@ begin
   Holdings.DeleteBtn.Visible := current_user_access > 0;
   ItemsForm.DeleteBtn.Visible := current_user_access > 0;
 
-  Holdings.DeleteBtn.Enabled := current_user_access >= 8;
-  ItemsForm.DeleteBtn.Enabled := current_user_access >= 8;
+  Holdings.DeleteBtn.Enabled := current_user_access >= 6;
+  ItemsForm.DeleteBtn.Enabled := current_user_access >= 6;
 
   with FastRecordCreator do
   begin
@@ -133,9 +133,9 @@ begin
     finalexport1.Visible := current_user_access = 10;
     finalexport2.Visible := current_user_access = 10;
     Utitlities1.Visible  := current_user_access = 10;
-    MyRecords.Visible  := (current_user_access > 0) and (current_user_access <= 8);
-    TntLabel2.Visible  := current_user_access > 8;
-    UsersCombo.Visible  := current_user_access > 8;
+    MyRecords.Visible  := (current_user_access > 0) and (current_user_access <= 6);
+    TntLabel2.Visible  := current_user_access = 10;
+    UsersCombo.Visible  := current_user_access = 10;
     ExporttoWordBtn.Visible := current_user_access = 10;
     About.Enabled := true;
     statistics_button.Visible := current_user_access = 10;

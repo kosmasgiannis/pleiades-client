@@ -232,6 +232,12 @@ var
   res, aa, recnr : integer;
   q : string;
 begin
+if ((current_user_access = 6) and (UserCode <> Data.securebasket.FieldByName('creator').AsInteger) ) then
+begin
+  WideShowMessage('You do not have permission to delete holdings for this record.');
+end
+else
+begin
  q := '';
  aa:=0;
  if not data.hold.IsEmpty then
@@ -241,13 +247,13 @@ begin
    if res = mrYes then
      begin
        recnr := Data.Securebasket.FieldByName('recno').AsInteger;
-       if (Data.hold.FieldByName('aa').isNULL = false) then 
+       if (Data.hold.FieldByName('aa').isNULL = false) then
        begin
          aa := Data.hold.FieldByName('aa').AsInteger;
          q := 'UPDATE hold SET aa=aa-1 WHERE recno = :recno AND aa > :aa;';
        end;
        data.hold.delete;
-       if (q <> '') then 
+       if (q <> '') then
        begin
          with Data.MyCommand1 do
          begin
@@ -262,7 +268,7 @@ begin
        Close;
      end;
  end;
-
+end;
 end;
 
 procedure Refresh_Items;
@@ -317,6 +323,12 @@ end;
 procedure THoldings.TntBitBtn1Click(Sender: TObject);
 var ho : integer;
 begin
+if ((current_user_access = 6) and (UserCode <> Data.securebasket.FieldByName('creator').AsInteger) ) then
+begin
+  WideShowMessage('You do not have permission to add items for this record.');
+end
+else
+begin
   ho := -1;
   if IsInEdit(Data.hold) Then ho:=SaveHold;
 
@@ -339,7 +351,7 @@ begin
     SetWindowsPosition;
     ItemsForm.Show;
   end;
-
+end;
 end;
 
 procedure THoldings.TntDBGrid1DblClick(Sender: TObject);
@@ -496,11 +508,19 @@ end;
 
 procedure THoldings.OKClick(Sender: TObject);
 begin
- ModalResult := mrOk;
- if (data.hold.FieldByName('collection').IsNull = true) then
+ if ((current_user_access = 6) and (UserCode <> Data.securebasket.FieldByName('creator').AsInteger) ) then
  begin
+  WideShowMessage('You do not have permission to modify holdings for this record.');
+  ModalResult := mrNone;
+ end
+ else
+ begin
+  ModalResult := mrOk;
+  if (data.hold.FieldByName('collection').IsNull = true) then
+  begin
    showmessage('Collection field is empty, please set a value.');
    ModalResult := mrNone;
+  end;
  end;
 end;
 

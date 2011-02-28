@@ -145,12 +145,18 @@ end;
 
 procedure TItemsForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-
+ if ((current_user_access = 6) and (UserCode <> Data.securebasket.FieldByName('creator').AsInteger) ) then
+ begin
+  DiscardItem;
+  WideShowMessage('You do not have permission to modify items for this record.');
+ end
+ else
+ begin
   case ModalResult of
     mrOk : if IsInEdit(data.Items) Then SaveItem;
     mrCancel : DiscardItem;
   end;
-
+ end;
 end;
 
 procedure TItemsForm.CancelClick(Sender: TObject);
@@ -167,7 +173,12 @@ procedure TItemsForm.DeleteBtnClick(Sender: TObject);
 var
   recnr, res: integer;
 begin
-
+if ((current_user_access = 6) and (UserCode <> Data.securebasket.FieldByName('creator').AsInteger) ) then
+begin
+  WideShowMessage('You do not have permission to delete items for this record.');
+end
+else
+begin
  if not data.items.IsEmpty then
  begin
    res := WideMessageDlg('Do you want to delete this item from the database?',
@@ -180,7 +191,7 @@ begin
        Close;
      end;
  end;
-
+end;
 end;
 
 procedure TItemsForm.DateTimePicker2CloseUp(Sender: TObject);
