@@ -8,7 +8,8 @@ uses
   StdCtrls, ComCtrls, Registry, Buttons, CRGrid, MemData, cUnicodeCodecs,
   TntStdCtrls, TntClasses, TntDialogs, TntExtCtrls, TntButtons, TntActnList,
   TntMenus, TntComCtrls, TntGrids,  WordXP,
-  xmldom, XMLIntf, msxmldom, XMLDoc, MemDS, common, zoomit, utility, Grids;
+  xmldom, XMLIntf, msxmldom, XMLDoc, MemDS, common, zoomit, utility, Grids,
+  jpeg;
 
 const
   AppName_ = 'Pleiades';
@@ -135,6 +136,7 @@ type
     ExportToWordBtn: TTntBitBtn;
     statistics_button: TTntBitBtn;
     TntLabel3: TTntLabel;
+    Image1: TImage;
     procedure FormCreate(Sender: TObject);
     procedure NewClick(Sender: TObject);
     procedure ExitActionExecute(Sender: TObject);
@@ -2502,6 +2504,7 @@ procedure TFastRecordCreator.statistics_buttonClick(Sender: TObject);
 begin
   statisticsForm.ShowModal;
 end;
+
 
 end.
 
