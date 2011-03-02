@@ -133,7 +133,7 @@ begin
     finalexport1.Visible := current_user_access = 10;
     finalexport2.Visible := current_user_access = 10;
     Utitlities1.Visible  := current_user_access = 10;
-    MyRecords.Visible  := (current_user_access > 0) and (current_user_access <= 6);
+    MyRecords.Visible  := (current_user_access > 0) and (current_user_access <= 8);
     TntLabel2.Visible  := current_user_access = 10;
     UsersCombo.Visible  := current_user_access = 10;
     ExporttoWordBtn.Visible := current_user_access = 10;
