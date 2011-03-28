@@ -694,71 +694,61 @@ begin
         if ((not FieldByName('enum1').IsNull) and (trim(FieldByName('enum1').Value)<>'')) then
         begin
           junk := GetIniMappings('enumeration','1');
-          if junk = '' then junk := '?';
-          h853 := h853+'$a'+junk;
+          if junk <> '' then h853 := h853+'$a'+junk;
           h863 := h863+'$a'+FieldByName('enum1').Value;
         end;
         if ((not FieldByName('enum2').IsNull) and (trim(FieldByName('enum2').Value)<>'')) then
         begin
           junk := GetIniMappings('enumeration','2');
-          if junk = '' then junk := '?';
-          h853 := h853+'$b'+junk;
+          if junk <> '' then h853 := h853+'$b'+junk;
           h863 := h863+'$b'+FieldByName('enum2').Value;
         end;
         if ((not FieldByName('enum3').IsNull) and (trim(FieldByName('enum3').Value)<>'')) then
         begin
           junk := GetIniMappings('enumeration','3');
-          if junk = '' then junk := '?';
-          h853 := h853+'$c'+junk;
+          if junk <> '' then h853 := h853+'$c'+junk;
           h863 := h863+'$c'+FieldByName('enum3').Value;
         end;
         if ((not FieldByName('enum4').IsNull) and (trim(FieldByName('enum4').Value)<>'')) then
         begin
           junk := GetIniMappings('enumeration','4');
-          if junk = '' then junk := '?';
-          h853 := h853+'$d'+junk;
+          if junk <> '' then h853 := h853+'$d'+junk;
           h863 := h863+'$d'+FieldByName('enum4').Value;
         end;
         if ((not FieldByName('enum5').IsNull) and (trim(FieldByName('enum5').Value)<>'')) then
         begin
           junk := GetIniMappings('enumeration','5');
-          if junk = '' then junk := '?';
-          h853 := h853+'$e'+junk;
+          if junk <> '' then h853 := h853+'$e'+junk;
           h863 := h863+'$e'+FieldByName('enum5').Value;
         end;
         if ((not FieldByName('enum6').IsNull) and (trim(FieldByName('enum6').Value)<>'')) then
         begin
           junk := GetIniMappings('enumeration','6');
-          if junk = '' then junk := '?';
-          h853 := h853+'$f'+junk;
+          if junk <> '' then h853 := h853+'$f'+junk;
           h863 := h863+'$f'+FieldByName('enum6').Value;
         end;
         if ((not FieldByName('chrono1').IsNull) and (trim(FieldByName('chrono1').Value)<>'')) then
         begin
           junk := GetIniMappings('chronology','1');
-          if junk = '' then junk := '?';
-          h853 := h853+'$i'+junk;
+          if junk <> '' then h853 := h853+'$i'+junk;
           h863 := h863+'$i'+FieldByName('chrono1').Value;
         end;
         if ((not FieldByName('chrono2').IsNull) and (trim(FieldByName('chrono2').Value)<>'')) then
         begin
           junk := GetIniMappings('chronology','2');
-          if junk = '' then junk := '?';
-          h853 := h853+'$j'+junk;
+          if junk <> '' then h853 := h853+'$j'+junk;
           h863 := h863+'$j'+FieldByName('chrono2').Value;
         end;
         if ((not FieldByName('chrono3').IsNull) and (trim(FieldByName('chrono3').Value)<>'')) then
         begin
           junk := GetIniMappings('chronology','3');
-          if junk = '' then junk := '?';
-          h853 := h853+'$k'+junk;
+          if junk <> '' then h853 := h853+'$k'+junk;
           h863 := h863+'$k'+FieldByName('chrono3').Value;
         end;
         if ((not FieldByName('chrono4').IsNull) and (trim(FieldByName('chrono4').Value)<>'')) then
         begin
           junk := GetIniMappings('chronology','4');
-          if junk = '' then junk := '?';
-          h853 := h853+'$l'+junk;
+          if junk <> '' then h853 := h853+'$l'+junk;
           h863 := h863+'$l'+FieldByName('chrono4').Value;
         end;
       end;
