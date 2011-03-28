@@ -189,6 +189,7 @@ begin
     maxaa := get_max_hold_aa(Data.SecureBasket.FieldByName('recno').AsInteger);
     data.hold.FieldByName('aa').AsInteger := maxaa+1;
   end;
+  data.hold.FieldByName('cln').Value := trim(data.hold.FieldByName('cln').Value);
   PostTable(data.hold);
   result:=data.hold.fieldbyname('holdon').asinteger;
 //  data.hold.Refresh;
