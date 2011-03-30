@@ -2,10 +2,11 @@ unit utils;
 
 interface
 
-uses Classes, Windows, ShellApi, wininet, Forms, SysUtils, Dialogs;
+uses Classes, Windows, URLMon, ShellApi, wininet, Forms, SysUtils, Dialogs;
 
 function GetFileFromInternet(const AUrl:string; AStream:TStream): boolean;
-function DownloadFile(const url: string; const destinationFileName: string): boolean;
+function DownloadFile(SourceFile, DestFile: string): Boolean;
+function DownloadFile2(const url: string; const destinationFileName: string): boolean;
 function GetLastErrorText(): string;
 function RunFile(homedir, filename,params : string; Showmode:integer) : integer;
 function RunFile_nowait(homedir, filename,params : string; Showmode:integer) : integer;
@@ -53,7 +54,16 @@ begin
   end;
 end;
 
-function DownloadFile(const url: string; const destinationFileName: string): boolean;
+function DownloadFile(SourceFile, DestFile: string): Boolean;
+begin
+  try
+    Result := UrlDownloadToFile(nil, PChar(SourceFile), PChar(DestFile), 0, nil) = 0;
+  except
+    Result := False;
+  end;
+end;
+
+function DownloadFile2(const url: string; const destinationFileName: string): boolean;
 var
   hInet: HINTERNET;
   hFile: HINTERNET;
@@ -64,7 +74,7 @@ begin
   result := False;
   hInet := InternetOpen(PChar(application.title),
     INTERNET_OPEN_TYPE_PRECONFIG,nil,nil,0);
-  hFile := InternetOpenURL(hInet,PChar(url),nil,0,0,0);
+  hFile := InternetOpenURL(hInet,PChar(url),nil,0,INTERNET_FLAG_RELOAD,0);
   if Assigned(hFile) then
   begin
     AssignFile(localFile,destinationFileName);
