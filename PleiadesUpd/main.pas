@@ -192,6 +192,9 @@ begin
   end;
  end;
  templocation:=GetEnvironmentVariable('TEMP');
+ if (templocation[length(templocation)] <> '\') then
+    templocation:=templocation+'\';
+
  memo1.Lines.Add(templocation);
  if batchmode then Application.Terminate;
 end;
