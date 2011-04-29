@@ -38,7 +38,7 @@ object FastRecordCreator: TFastRecordCreator
     Left = 0
     Top = 0
     Width = 1038
-    Height = 780
+    Height = 772
     ActivePage = advsearchpage
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
@@ -55,7 +55,7 @@ object FastRecordCreator: TFastRecordCreator
       OnEnter = advsearchpageEnter
       DesignSize = (
         1030
-        752)
+        744)
       object TntLabel1: TTntLabel
         Left = 836
         Top = 10
@@ -2413,7 +2413,7 @@ object FastRecordCreator: TFastRecordCreator
   end
   object StatusBar1: TTntStatusBar
     Left = 0
-    Top = 780
+    Top = 772
     Width = 1038
     Height = 19
     Panels = <
