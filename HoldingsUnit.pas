@@ -184,23 +184,26 @@ var
   maxaa : integer;
   //recnr : integer;
 begin
-  if ((data.hold.fieldbyname('aa').IsNull = true) or (data.hold.fieldbyname('aa').AsInteger = 0) ) then 
+  if ((data.hold.State <> dsInsert) and ( data.hold.State <> dsEdit)) then EditTable(data.hold);
+
+  if ((data.hold.fieldbyname('aa').IsNull = true) or (data.hold.fieldbyname('aa').AsInteger = 0) ) then
   begin
     maxaa := get_max_hold_aa(Data.SecureBasket.FieldByName('recno').AsInteger);
     data.hold.FieldByName('aa').AsInteger := maxaa+1;
   end;
   data.hold.FieldByName('cln').Value := trim(data.hold.FieldByName('cln').Value);
-  PostTable(data.hold);
   result:=data.hold.fieldbyname('holdon').asinteger;
 //  data.hold.Refresh;
 //  data.items.Refresh;
 
-  if data.hold.State = dsInsert
-    Then append_move(UserCode, 6,today, CurrentUserName + ' added a new holding for recno=' +
-                     Data.SecureBasket.FieldByName('recno').AsString)
-    Else append_move(UserCode, 6,today, CurrentUserName + ' changed the holding for recno=' +
-                     Data.SecureBasket.FieldByName('recno').AsString);
+  if data.hold.State = dsInsert then
+    append_move(UserCode, 6,today, CurrentUserName + ' added a new holding for recno=' +
+                Data.SecureBasket.FieldByName('recno').AsString);
+  if data.HoldSource.State = dsEdit then
+    append_move(UserCode, 6,today, CurrentUserName + ' changed the holding for recno=' +
+                Data.SecureBasket.FieldByName('recno').AsString);
 
+  PostTable(data.hold);
 
   with Data.SecureBasket do
   begin
@@ -213,7 +216,6 @@ begin
     marcrecord2memo(rec, MarcEditorForm.full);
     MARCEditorform.SaveData;
   end;
-
   //recnr := Data.SecureBasket.FieldByName('recno').AsInteger;
   //RecordUpdated(myzebrahost, 'update', recnr, MakeMRCFromSecureBasket(recnr));
 end;

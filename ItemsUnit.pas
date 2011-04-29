@@ -123,12 +123,12 @@ begin
     FieldByName('modifier').AsInteger := UserCode;
     FieldByName('datemodified').AsDateTime := today;
 
-    if State = dsInsert
-        Then  append_move(UserCode, 6,today, CurrentUserName + ' added a new item for recno=' +
-                     Data.SecureBasket.FieldByName('recno').AsString)
-        Else  append_move(UserCode, 6,today, CurrentUserName + ' changed the item for recno=' +
-                     Data.SecureBasket.FieldByName('recno').AsString);
-
+    if State = dsInsert then
+        append_move(UserCode, 6,today, CurrentUserName + ' added a new item for recno=' +
+                    Data.SecureBasket.FieldByName('recno').AsString);
+    if State = dsEdit then
+        append_move(UserCode, 6,today, CurrentUserName + ' changed the item for recno=' +
+                    Data.SecureBasket.FieldByName('recno').AsString);
     PostTable(data.items);
   end;
 
@@ -161,12 +161,12 @@ end;
 
 procedure TItemsForm.CancelClick(Sender: TObject);
 begin
-  Close;
+  ItemsForm.Close;
 end;
 
 procedure TItemsForm.OKClick(Sender: TObject);
 begin
-  Close;
+  ItemsForm.Close;
 end;
 
 procedure TItemsForm.DeleteBtnClick(Sender: TObject);
