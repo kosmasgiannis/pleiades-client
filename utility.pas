@@ -130,6 +130,7 @@ begin
     N1.Visible := current_user_access = 10;
     //ChangeDatabase1.Visible := current_user_access = 10;
     import1.Visible:= current_user_access = 10;
+    replaceMARCrecords1.Visible:= current_user_access = 10;
     finalexport1.Visible := current_user_access = 10;
     finalexport2.Visible := current_user_access = 10;
     Utitlities1.Visible  := current_user_access = 10;

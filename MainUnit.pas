@@ -14,7 +14,7 @@ uses
 const
   AppName_ = 'Pleiades';
   AppVersion_ = '2.2.22';         // Change this immediately after the new version is released.
-  AppReleaseDate_ = '2011-04-29'; // Change this just before the new version is about to be released.
+  AppReleaseDate_ = '2011-05-02'; // Change this just before the new version is about to be released.
 
 type
   TFastRecordCreator = class(TForm)
@@ -137,6 +137,7 @@ type
     statistics_button: TTntBitBtn;
     TntLabel3: TTntLabel;
     Image1: TImage;
+    ReplaceMARCrecords1: TTntMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure NewClick(Sender: TObject);
     procedure ExitActionExecute(Sender: TObject);
@@ -212,6 +213,7 @@ type
     procedure BibAuthSwitchClick(Sender: TObject);
     procedure ExportToWordBtnClick(Sender: TObject);
     procedure statistics_buttonClick(Sender: TObject);
+    procedure ReplaceMARCrecords1Click(Sender: TObject);
   private
     { Private declarations }
 //    OldWindProc: TWndMethod;  //Old Window Procedure
@@ -280,7 +282,8 @@ uses DataUnit, mycharconversion, NewBibliographicUnit,
      SplashScrUnit, BranchUnit, CollectionUnit,
      LoancatUnit, ProcessStatusUnit, LoanCategoryUnit, ConfigurationUnit,
      LoginUnit, DigitalSettings, ReportsUnit, zlocate, zoom, MARCAuthEditor,
-  statistics;
+  statistics,
+  ReplaceMARCrecs;
 
 {$R *.dfm}
 
@@ -2505,6 +2508,12 @@ begin
   statisticsForm.ShowModal;
 end;
 
+
+procedure TFastRecordCreator.ReplaceMARCrecords1Click(Sender: TObject);
+begin
+  ReplaceMARCrecords.ShowModal;
+  fastrecordcreator.SetFocus;
+end;
 
 end.
 

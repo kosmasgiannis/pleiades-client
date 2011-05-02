@@ -2044,7 +2044,7 @@ object FastRecordCreator: TFastRecordCreator
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = [fsBold]
-        ItemHeight = 0
+        ItemHeight = 13
         ParentFont = False
         TabOrder = 1
       end
@@ -2616,6 +2616,10 @@ object FastRecordCreator: TFastRecordCreator
       end
       object FinalExport2: TTntMenuItem
         Caption = 'Final_Export'
+      end
+      object ReplaceMARCrecords1: TTntMenuItem
+        Caption = 'Replace MARC records'
+        OnClick = ReplaceMARCrecords1Click
       end
     end
     object Help1: TTntMenuItem

@@ -73,7 +73,8 @@ uses
   MARCAuthEditor in 'MARCAuthEditor.pas' {MARCAuthEditorform: TTntForm},
   md5 in 'MD5.pas',
   statistics in 'statistics.pas' {statisticsForm},
-  HoldingsRangeUnit in 'HoldingsRangeUnit.pas' {HoldingsRange: TTntForm};
+  HoldingsRangeUnit in 'HoldingsRangeUnit.pas' {HoldingsRange: TTntForm},
+  ReplaceMARCrecs in 'ReplaceMARCrecs.pas' {ReplaceMARCrecords};
 
 {$R *.res}
 
@@ -144,5 +145,6 @@ begin
   Application.CreateForm(TMARCAuthEditorform, MARCAuthEditorform);
   Application.CreateForm(TstatisticsForm, statisticsForm);
   Application.CreateForm(THoldingsRange, HoldingsRange);
+  Application.CreateForm(TReplaceMARCrecords, ReplaceMARCrecords);
   Application.Run;
 end.
