@@ -821,7 +821,7 @@ begin
       if (not Data.ItemsQuery.FieldByName('copy').IsNull) and
          (trim(Data.ItemsQuery.FieldByName('copy').Value)<>'')  then
       begin
-        item876 := item876+'$f';
+        item876 := item876+'$t';
         junk := Data.ItemsQuery.fieldbyname('copy').Value;
         for j:=1 to length(junk) do
           if (ord(junk[j])>31) then item876:=item876+junk[j];
