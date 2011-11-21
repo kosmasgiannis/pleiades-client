@@ -89,6 +89,7 @@ ZOOM_INITIALIZED : Boolean;
 Zoom_Hosts : array[1..MAXHOSTS] of ZOOM_HOST;
 myzebraauthhost, myzebrahost : ZOOM_HOST;
 
+function koha_item_type(ldr : string) : string;
 function type_of_material(ldr : string) : string;
 procedure correct_marc_memo(fullrec : Tmemo);
 
@@ -131,6 +132,8 @@ function MakeMRCFromBasket(var resrec : UTF8String) :integer; overload;
 function MakeMRCFromBasket : UTF8String; overload;
 function MakeMRCFromSecureBasket(recno : integer) : UTF8String; overload;
 function MakeMRCFromSecureBasket(recno : integer; var resrec : UTF8String) : integer; overload;
+function MakeMRCFromSecureBasketforKOHA(recno : integer) : UTF8String; overload;
+function MakeMRCFromSecureBasketforKOHA(recno : integer; var resrec : UTF8String) : integer; overload;
 function MakeMRCFromAuth(recno : integer) : UTF8String; overload;
 function MakeMRCFromAuth(recno : integer; var resrec : UTF8String) : integer; overload;
 
@@ -1140,6 +1143,365 @@ end;
 function MakeMRCFromSecureBasket(recno : integer) : UTF8String;
 begin
   MakeMRCFromSecureBasket(recno, result);
+end;
+
+//FIXME : Problem with very long fields...
+function MakeMRCFromBasketExforKOHA (t: TCustomMyDataset; var resrec : UTF8String) : integer;
+var
+  Lines : TTntStringList;
+  kohaitemtype,
+  hold, basehold, i952, h952, fcln, fcln_ip, junk, temp : WideString;
+  marcrec : UTF8String;
+  tag : string;
+  xx, yy, dpos, hcnt, itcnt, j, recno, holdon, k, dmrc : integer;
+  FoundRecno : boolean;
+  chk : TTntStringList;
+begin
+  resrec:='';
+  Lines := TTntStringList.Create;
+  Lines.Clear;
+
+  recno := t.FieldByName('recno').AsInteger;
+
+  Data.HoldQuery.Close;
+  Data.HoldQuery.ParamByName('recno').AsInteger := recno;
+  Data.HoldQuery.Open;
+
+  marcrec := WideStringToString(t.GetBlob('text').AsWideString, Greek_codepage);
+
+  kohaitemtype := koha_item_type(marcrec);
+
+  if marcrec <> '' then marcrecord2lines(marcrec,lines);
+  FoundRecno := False;
+
+  //Erasing holdings information from MARC
+  for xx:=Lines.Count-1 downto 0 do
+  begin
+    tag := copy(Lines[xx],2,3);
+    if ((tag='936') or (tag='084')or (tag='952') or (tag='852') or (tag='853') or (tag='863') or (tag='866')or (tag='867')or (tag='868')or (tag='876')) then
+      Lines.Delete(xx)
+    else if (tag='001') then
+    begin
+      Lines[xx] :='[001] '+IntToStr(recno);
+      FoundRecno := True;
+    end;
+  end;
+  if (not FoundRecno)and(Lines.Count>1) Then Lines[1] :='[001] '+IntToStr(recno);
+
+  hcnt:=Data.HoldQuery.RecordCount;
+  Data.HoldQuery.First;
+
+  chk := TTntStringList.Create;
+
+  //Inserting holdings and items information in MARC 952
+  for xx:= 1 to hcnt do
+  begin
+    //Building 084 tag
+    fcln:='';
+    fcln_ip:='';
+
+    if not IsEmptyField(Data.HoldQuery, 'cln') then
+    begin
+      fcln := Data.HoldQuery.fieldbyname('cln').Value;
+      temp := '  '+'$a'+fcln;
+      if not IsEmptyField(Data.HoldQuery, 'cln_ip') then
+      begin
+        fcln_ip := Data.HoldQuery.fieldbyname('cln_ip').Value;
+        temp := temp+'$b'+fcln_ip;
+      end;
+      dpos:=0;
+      for yy:=Lines.Count-1 downto 0 do
+      begin
+        dpos := strtointdef(copy(Lines[yy],2,3),0);
+        if ((dpos > 0) and (dpos <= 84)) then
+        begin
+          dpos:=yy+1;
+          break;
+        end;
+        dpos :=0;
+      end;
+
+      if (dpos <> 0) then
+        if chk.IndexOf(temp) < 0 then
+        begin
+          Lines.Insert(dpos,'[084] '+temp);
+          chk.Add(temp);
+        end;
+    end;
+
+    h952 := '  ';
+
+    if (not Data.HoldQuery.FieldByName('branch').IsNull) and
+       (trim(Data.HoldQuery.FieldByName('branch').Value)<>'') then
+    begin
+      h952 := h952+'$a'+Data.HoldQuery.fieldbyname('branch').Value;
+      h952 := h952+'$b'+Data.HoldQuery.fieldbyname('branch').Value;
+    end;
+
+    if (not Data.HoldQuery.FieldByName('collection').IsNull) and
+       (trim(Data.HoldQuery.FieldByName('collection').Value)<>'')  then
+    begin
+      h952 := h952+'$8'+Data.HoldQuery.fieldbyname('collection').Value;
+    end;
+
+    fcln:='';
+
+    if (not Data.HoldQuery.FieldByName('cln').IsNull) and
+       (trim(Data.HoldQuery.FieldByName('cln').Value)<>'')  then
+    begin
+      fcln := Data.HoldQuery.fieldbyname('cln').Value;
+
+      if (not Data.HoldQuery.FieldByName('cln_ip').IsNull) and
+         (trim(Data.HoldQuery.FieldByName('cln_ip').Value)<>'')  then
+      begin
+        fcln := fcln+' '+Data.HoldQuery.fieldbyname('cln_ip').Value;
+      end;
+      h952 := h952+'$j'+fcln;
+      h952 := h952+'$o'+fcln;  // FIXME : is this correct?
+    end;
+
+    h952 := h952+'$90'; // Withdrawn status (default value)
+    h952 := h952+'$40'; // Damaged status (default value)
+    h952 := h952+'$y'+kohaitemtype;
+
+{
+    if hold <> '  ' then
+    begin
+      hold:='[852] '+hold;
+      Lines.Add(hold);
+    end;
+}
+    temp := '';
+    with  Data.HoldQuery do
+    begin
+      if (((not FieldByName('enum1').IsNull) and (trim(FieldByName('enum1').Value)<>'')) or
+          ((not FieldByName('enum2').IsNull) and (trim(FieldByName('enum2').Value)<>'')) or
+          ((not FieldByName('enum3').IsNull) and (trim(FieldByName('enum3').Value)<>'')) or
+          ((not FieldByName('enum4').IsNull) and (trim(FieldByName('enum4').Value)<>'')) or
+          ((not FieldByName('enum5').IsNull) and (trim(FieldByName('enum5').Value)<>'')) or
+          ((not FieldByName('enum6').IsNull) and (trim(FieldByName('enum6').Value)<>'')) or
+          ((not FieldByName('chrono1').IsNull) and (trim(FieldByName('chrono1').Value)<>'')) or
+          ((not FieldByName('chrono2').IsNull) and (trim(FieldByName('chrono2').Value)<>'')) or
+          ((not FieldByName('chrono3').IsNull) and (trim(FieldByName('chrono3').Value)<>'')) or
+          ((not FieldByName('chrono4').IsNull) and (trim(FieldByName('chrono4').Value)<>''))) then
+      begin
+        if ((not FieldByName('enum1').IsNull) and (trim(FieldByName('enum1').Value)<>'')) then
+        begin
+          junk := GetIniMappings('enumeration','1');
+          if junk <> '' then temp := temp+junk;
+          temp := ' '+temp+' '+FieldByName('enum1').Value;
+        end;
+        if ((not FieldByName('enum2').IsNull) and (trim(FieldByName('enum2').Value)<>'')) then
+        begin
+          junk := GetIniMappings('enumeration','2');
+          if junk <> '' then temp := temp+junk;
+          temp := ' '+temp+' '+FieldByName('enum2').Value;
+        end;
+        if ((not FieldByName('enum3').IsNull) and (trim(FieldByName('enum3').Value)<>'')) then
+        begin
+          junk := GetIniMappings('enumeration','3');
+          if junk <> '' then temp := temp+junk;
+          temp := ' '+temp+' '+FieldByName('enum3').Value;
+        end;
+        if ((not FieldByName('enum4').IsNull) and (trim(FieldByName('enum4').Value)<>'')) then
+        begin
+          junk := GetIniMappings('enumeration','4');
+          if junk <> '' then temp := temp+junk;
+          temp := ' '+temp+' '+FieldByName('enum4').Value;
+        end;
+        if ((not FieldByName('enum5').IsNull) and (trim(FieldByName('enum5').Value)<>'')) then
+        begin
+          junk := GetIniMappings('enumeration','5');
+          if junk <> '' then temp := temp+junk;
+          temp := ' '+temp+' '+FieldByName('enum5').Value;
+        end;
+        if ((not FieldByName('enum6').IsNull) and (trim(FieldByName('enum6').Value)<>'')) then
+        begin
+          junk := GetIniMappings('enumeration','6');
+          if junk <> '' then temp := temp+junk;
+          temp := ' '+temp+' '+FieldByName('enum6').Value;
+        end;
+
+        if ((not FieldByName('chrono1').IsNull) and (trim(FieldByName('chrono1').Value)<>'')) then
+        begin
+          junk := GetIniMappings('chronology','1');
+          if junk <> '' then temp := temp+junk;
+          temp := ' '+temp+' '+FieldByName('chrono1').Value;
+        end;
+        if ((not FieldByName('chrono2').IsNull) and (trim(FieldByName('chrono2').Value)<>'')) then
+        begin
+          junk := GetIniMappings('chronology','2');
+          if junk <> '' then temp := temp+junk;
+          temp := ' '+temp+' '+FieldByName('chrono2').Value;
+        end;
+        if ((not FieldByName('chrono3').IsNull) and (trim(FieldByName('chrono3').Value)<>'')) then
+        begin
+          junk := GetIniMappings('chronology','3');
+          if junk <> '' then temp := temp+junk;
+          temp := ' '+temp+' '+FieldByName('chrono3').Value;
+        end;
+        if ((not FieldByName('chrono4').IsNull) and (trim(FieldByName('chrono4').Value)<>'')) then
+        begin
+          junk := GetIniMappings('chronology','4');
+          if junk <> '' then temp := temp+junk;
+          temp := ' '+temp+' '+FieldByName('chrono4').Value;
+        end;
+        temp:=squeeze(temp);
+      end;
+    end;
+    if (temp <> '') then
+    begin
+      h952 := h952+'$h'+temp;
+    end;
+
+    if (not Data.HoldQuery.FieldByName('f866').IsNull) and
+       (trim(Data.HoldQuery.FieldByName('f866').Value)<>'')  then
+    begin
+      hold:='[866] '+' 0'+'$a';
+      junk := Data.HoldQuery.GetBlob('f866').AsWideString;
+      for j:=1 to length(junk) do
+        if (ord(junk[j])>31) then hold:=hold+junk[j];
+      Lines.Add(hold);
+    end;
+
+    if (not Data.HoldQuery.FieldByName('f867').IsNull) and
+       (trim(Data.HoldQuery.FieldByName('f867').Value)<>'')  then
+    begin
+      hold:='[867] '+' 0'+'$a';
+      junk := Data.HoldQuery.GetBlob('f867').AsWideString;
+      for j:=1 to length(junk) do
+        if (ord(junk[j])>31) then hold:=hold+junk[j];
+      Lines.Add(hold);
+    end;
+
+    if (not Data.HoldQuery.FieldByName('f868').IsNull) and
+       (trim(Data.HoldQuery.FieldByName('f868').Value)<>'')  then
+    begin
+      hold:='[868] '+' 0'+'$a';
+      junk := Data.HoldQuery.GetBlob('f868').AsWideString;
+      for j:=1 to length(junk) do
+        if (ord(junk[j])>31) then hold:=hold+junk[j];
+      Lines.Add(hold);
+    end;
+
+    holdon := data.HoldQuery.FieldByName('holdon').AsInteger;
+
+    Data.ItemsQuery.Close;
+    Data.ItemsQuery.ParamByName('holdon').AsInteger := holdon;
+    Data.ItemsQuery.Open;
+    itcnt := data.ItemsQuery.RecordCount;
+    Data.ItemsQuery.First;
+
+    for k := 1 to itcnt do
+    begin
+      i952 := h952;
+      //From Items
+      if (not Data.ItemsQuery.FieldByName('barcode').IsNull) and
+         (trim(Data.ItemsQuery.FieldByName('barcode').Value)<>'')  then
+      begin
+        i952 := i952+'$p';
+        junk := Data.ItemsQuery.fieldbyname('barcode').Value;
+        for j:=1 to length(junk) do
+          if (ord(junk[j])>31) then i952:=i952+junk[j];
+      end;
+
+      if (not Data.ItemsQuery.FieldByName('copy').IsNull) and
+         (trim(Data.ItemsQuery.FieldByName('copy').Value)<>'')  then
+      begin
+        i952 := i952+'$t';
+        junk := Data.ItemsQuery.fieldbyname('copy').Value;
+        for j:=1 to length(junk) do
+          if (ord(junk[j])>31) then i952:=i952+junk[j];
+      end;
+{
+// FIXME KOHA
+      if (not Data.ItemsQuery.FieldByName('loan_category').IsNull) and
+         (trim(Data.ItemsQuery.FieldByName('loan_category').Value)<>'')  then
+      begin
+        i952 := i952+'$h';
+        // Kosmas: Do not delete the comments bellow. Using codes instead of descriptions to reduce space...
+        // in any case it should be changed to use the table from mysql
+        junk := GetIniMappings('loancategory',Data.ItemsQuery.fieldbyname('loan_category').Value);
+        if junk = '' then
+        junk := Data.ItemsQuery.fieldbyname('loan_category').Value;
+        for j:=1 to length(junk) do
+          if (ord(junk[j])>31) then i952:=i952+junk[j];
+      end;
+
+// FIXME KOHA
+      if (not Data.ItemsQuery.FieldByName('process_status').IsNull) and
+         (trim(Data.ItemsQuery.FieldByName('process_status').Value)<>'')  then
+      begin
+        i952 := i952+'$j';
+        // Kosmas: Do not delete the comments bellow. Using codes instead of descriptions to reduce space...
+        // in any case it should be changed to use the table from mysql
+        junk := GetIniMappings('processstatus',Data.ItemsQuery.fieldbyname('process_status').Value);
+        if junk='' then
+        junk := Data.ItemsQuery.fieldbyname('process_status').Value;
+        for j:=1 to length(junk) do
+          if (ord(junk[j])>31) then i952:=i952+junk[j];
+      end;
+}
+      //From items
+      if (not Data.ItemsQuery.FieldByName('note_opac').IsNull) and
+         (trim(Data.ItemsQuery.FieldByName('note_opac').Value)<>'')  then
+      begin
+        i952 := i952+'$z';
+        junk := Data.ItemsQuery.fieldbyname('note_opac').Value;
+        for j:=1 to length(junk) do
+          if (ord(junk[j])>31) then i952:=i952+junk[j];
+      end;
+      if (not Data.ItemsQuery.FieldByName('note_internal').IsNull) and
+         (trim(Data.ItemsQuery.FieldByName('note_internal').Value)<>'')  then
+      begin
+        i952 := i952+'$x';
+        junk := Data.ItemsQuery.fieldbyname('note_internal').Value;
+        for j:=1 to length(junk) do
+          if (ord(junk[j])>31) then i952:=i952+junk[j];
+      end;
+
+      if i952 <> '  ' then
+      begin
+        i952:='[952] '+i952;
+        Lines.Add(i952);
+      end;
+      Data.ItemsQuery.Next;
+    end;
+
+    Data.HoldQuery.Next;
+  end;
+
+  dmrc := disp2mrc(Lines,marcrec);
+
+  chk.Free;
+  Lines.Free;
+  if length(marcrec)>=10 then marcrec[10]:='a';
+  if length(marcrec)>=11 then marcrec[11]:='2';
+  if length(marcrec)>=12 then marcrec[12]:='2';
+  resrec:=marcrec;
+  result := dmrc;
+end;
+
+function MakeMRCFromSecureBasketforKOHA(recno : integer; var resrec : UTF8String) : integer;
+begin
+  with data do
+  begin
+    LastDataFromBasket.Close;
+    LastDataFromBasket.ParamByName('recno').AsInteger := recno;
+    LastDataFromBasket.Open;
+    if lastdatafrombasket.RecordCount <> 0 then
+      result:= MakeMRCFromBasketExforKOHA(LastDataFromBasket, resrec)
+    else
+    begin
+      resrec:='';
+      result:=-1;
+    end;
+  end;
+end;
+
+function MakeMRCFromSecureBasketforKOHA(recno : integer) : UTF8String;
+begin
+  MakeMRCFromSecureBasketforKOHA(recno, result);
 end;
 
 function MakeMRCFromAuth(recno : integer; var resrec : UTF8String) : integer;
@@ -2221,6 +2583,29 @@ begin
         if (pos(s,LC_ARCHIVE) > 0 ) then result:='AM'
         else
          result:='??';
+end;
+
+function koha_item_type(ldr : string) : string;
+var s:string;
+begin
+ s:=copy(ldr,7,2);
+ if (pos(s,LC_BOOK) > 0 ) then result:='BK'
+ else
+  if (pos(s,LC_SERIAL) > 0 ) then result:='CR'
+  else
+   if (pos(s,LC_MAPS) > 0 ) then result:='MP'
+   else
+    if (pos(s,LC_MUSIC) > 0 ) then result:='MU'
+    else
+     if (pos(s,LC_MUSICSR) > 0 ) then result:='MU'
+     else
+      if (pos(s,LC_VISUAL) > 0 ) then result:='VM'
+      else
+       if (pos(s,LC_CFILES) > 0 ) then result:='CF'
+       else
+        if (pos(s,LC_ARCHIVE) > 0 ) then result:='MX'
+        else
+         result:='BK';
 end;
 
 function check008(text:string) : integer;

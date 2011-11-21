@@ -109,13 +109,12 @@ object ExportForm: TExportForm
     Height = 22
     Style = csDropDownList
     ItemHeight = 14
-    ItemIndex = 0
     TabOrder = 1
-    Text = 'ISO2709'
     Items.Strings = (
       'ISO2709'
       'MARCXML'
-      'INTERNAL')
+      'INTERNAL'
+      'KOHA')
   end
   object CheckBox1: TTntCheckBox
     Left = 32

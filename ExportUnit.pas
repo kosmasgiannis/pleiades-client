@@ -280,25 +280,30 @@ begin
     if FastRecordCreator.bib_auth_status = 'bib' then
     begin
       if CheckBox1.Checked Then
-        rc := MakeMRCFromSecureBasket(ExpRecnos[i],marcrec)
+        if ComboBox1.ItemIndex <> 3 Then
+        begin
+          rc := MakeMRCFromSecureBasket(ExpRecnos[i],marcrec);
+        end
+        else // KOHA
+        begin
+          rc := MakeMRCFromSecureBasketforKOHA(ExpRecnos[i],marcrec);
+        end
       Else
         marcrec := GetLastDataFromBasket(ExpRecnos[i]);
-    end
-    else
-    begin
-      marcrec := GetLastDataFromAuth(ExpRecnos[i]);
-    end;
-
-    if rc <> 0 then
-      wideshowmessage('Record '+inttostr(ExpRecnos[i])+' exceeds MARC length limits');
-
-    ReplaceOrgCode(marcrec);
+    end
+    else
+    begin
+      marcrec := GetLastDataFromAuth(ExpRecnos[i]);
+    end;
+    if rc <> 0 then
+      wideshowmessage('Record '+inttostr(ExpRecnos[i])+' exceeds MARC length limits');
+    ReplaceOrgCode(marcrec);
     ReplaceRecno(ExpRecnos[i], marcrec);
     if length(marcrec) >= 10 then marcrec[10] := 'a';
     if length(marcrec) >= 11 then marcrec[11] := '2';
     if length(marcrec) >= 12 then marcrec[12] := '2';
 
-    if ComboBox1.ItemIndex = 1 Then marcrec := marc2marcxml(marcrec,true);
+    if ComboBox1.ItemIndex = 1 Then marcrec := marc2marcxml(marcrec,true);
     if ComboBox1.ItemIndex = 2 Then marcrec := ExportXMLInternal(true);
 
     write(F,marcrec);
@@ -371,7 +376,14 @@ begin
         if FastRecordCreator.bib_auth_status = 'bib' then
         begin
           if CheckBox1.Checked Then
-            rc := MakeMRCFromSecureBasket(recno,marcrec)
+            if ComboBox1.ItemIndex <> 3 Then
+            begin
+              rc := MakeMRCFromSecureBasket(recno,marcrec);
+            end
+            else // KOHA
+            begin
+              rc := MakeMRCFromSecureBasketforKOHA(recno,marcrec);
+            end
           Else
             marcrec := GetLastDataFromBasket(recno);
         end
