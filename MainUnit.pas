@@ -1035,19 +1035,36 @@ procedure TFastRecordCreator.LocateActionExecute(Sender: TObject);
 var recno,index:integer;
 begin
   recno := TntStringGrid1GetRecno(index);
+
   if recno = -1 then
   begin
     WideShowMessage('You have to be viewing a record to use this function.');
     exit;
   end;
-  if data.basket.Active Then
+
+  if bib_auth_status = 'bib' then
   begin
-    zlocateform.myrecno := -1;
-    zlocateform.source_record := '';
-    zlocateform.myrecno := recno;
-    zlocateform.calledfrom:='main';
-    zlocateform.source_record := GetLastDataFromBasket(recno);
-    zlocateform.ShowModal;
+    if data.basket.Active Then
+    begin
+      zlocateform.myrecno := -1;
+      zlocateform.source_record := '';
+      zlocateform.myrecno := recno;
+      zlocateform.calledfrom:='main';
+      zlocateform.source_record := GetLastDataFromBasket(recno);
+      zlocateform.ShowModal;
+    end;
+  end
+  else
+  begin
+    if data.auth.Active Then
+    begin
+      zlocateform.myrecno := -1;
+      zlocateform.source_record := '';
+      zlocateform.myrecno := recno;
+      zlocateform.calledfrom:='main';
+      zlocateform.source_record := GetLastDataFromAuth(recno);
+      zlocateform.ShowModal;
+    end;
   end;
 end;
 
