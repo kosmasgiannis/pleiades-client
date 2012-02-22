@@ -283,9 +283,8 @@ uses DataUnit, mycharconversion, NewBibliographicUnit,
      BackupUnit, MARCDisplayUnit, GlobalProcedures, SetPasswordUnit,
      SplashScrUnit, BranchUnit, CollectionUnit,
      LoancatUnit, ProcessStatusUnit, LoanCategoryUnit, ConfigurationUnit,
-     LoginUnit, DigitalSettings, ReportsUnit, zlocate, zoom, MARCAuthEditor,
-  statistics,
-  ReplaceMARCrecs;
+     LoginUnit, DigitalSettings, ReportsUnit, zlocate, zauthlocate, zoom,
+     MARCAuthEditor,  statistics,  ReplaceMARCrecs;
 
 {$R *.dfm}
 
@@ -1058,12 +1057,12 @@ begin
   begin
     if data.auth.Active Then
     begin
-      zlocateform.myrecno := -1;
-      zlocateform.source_record := '';
-      zlocateform.myrecno := recno;
-      zlocateform.calledfrom:='main';
-      zlocateform.source_record := GetLastDataFromAuth(recno);
-      zlocateform.ShowModal;
+      zauthlocateform.myrecno := -1;
+      zauthlocateform.source_record := '';
+      zauthlocateform.myrecno := recno;
+      zauthlocateform.calledfrom:='main';
+      zauthlocateform.source_record := GetLastDataFromAuth(recno);
+      zauthlocateform.ShowModal;
     end;
   end;
 end;
