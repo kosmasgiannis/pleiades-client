@@ -214,6 +214,7 @@ type
     procedure ExportToWordBtnClick(Sender: TObject);
     procedure statistics_buttonClick(Sender: TObject);
     procedure ReplaceMARCrecords1Click(Sender: TObject);
+    procedure ShowMARC1Click(Sender: TObject);
   private
     { Private declarations }
 //    OldWindProc: TWndMethod;  //Old Window Procedure
@@ -231,6 +232,7 @@ type
     procedure ExportBasketToWord;
     procedure ExportBasketToFile;
     procedure PopulateSearchComponents(inifname, langcode, profile :string);
+    procedure EditRecordOnDblClick;
   public
     { Public declarations }
     Languages, Materials, Greek_charset,
@@ -2007,7 +2009,7 @@ begin
   index := strtointdef(searchresults.Rows[searchresults.Row].Strings[0],-1)
 end;
 
-procedure TFastRecordCreator.searchresultsDblClick(Sender: TObject);
+procedure TFastRecordCreator.EditRecordOnDblClick;
 var recno,index : integer;
 begin
   recno := TntStringGrid1GetRecno(index);
@@ -2038,6 +2040,11 @@ begin
        Else MessOK('This record is probably deleted. Please refresh your dataset!');
    end;
   end;
+end;
+
+procedure TFastRecordCreator.searchresultsDblClick(Sender: TObject);
+begin
+  EditRecordOnDblClick;
 end;
 
 procedure TFastRecordCreator.searchresultsKeyPress(Sender: TObject;
@@ -2513,6 +2520,11 @@ procedure TFastRecordCreator.ReplaceMARCrecords1Click(Sender: TObject);
 begin
   ReplaceMARCrecords.ShowModal;
   fastrecordcreator.SetFocus;
+end;
+
+procedure TFastRecordCreator.ShowMARC1Click(Sender: TObject);
+begin
+  EditRecordOnDblClick;
 end;
 
 end.

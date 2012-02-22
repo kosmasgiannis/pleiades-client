@@ -2044,7 +2044,7 @@ object FastRecordCreator: TFastRecordCreator
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = [fsBold]
-        ItemHeight = 13
+        ItemHeight = 0
         ParentFont = False
         TabOrder = 1
       end
@@ -2451,6 +2451,7 @@ object FastRecordCreator: TFastRecordCreator
     object ShowMARC1: TTntMenuItem
       Caption = 'Edit MARC'
       ShortCut = 116
+      OnClick = ShowMARC1Click
     end
     object Locate1: TTntMenuItem
       Action = LocateAction
