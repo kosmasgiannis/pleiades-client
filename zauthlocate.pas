@@ -78,7 +78,7 @@ type
   public
     { Public declarations }
     //globalproxy,
-    current_format, author, title, isbn : WideString;
+    current_format, tag, heading: WideString;
     source_record, merged_record, located_record : UTF8String;
     myrecno : integer;
     calledfrom : string;
@@ -128,9 +128,8 @@ begin
  label12.Caption:='';
  treeview1.Items.Clear;
 
- get_author_title(source_record,'USMARC',author,title,false);
- author := remove_punctuation(author);
- title := remove_punctuation(title);
+ get_main_heading(source_record,tag,heading);
+ heading := remove_punctuation(heading);
  for p:=1 to MAXHOSTS do
   Zoom_authhosts[1].active:=false;
 
@@ -142,7 +141,6 @@ begin
  newresults.Cells[0,1]:='';
  newresults.Cells[1,1]:='';
  newresults.Cells[2,1]:='';
- newresults.Cells[3,1]:='';
 
  keys:=Tstringlist.Create;
  keys.Clear;
@@ -197,7 +195,6 @@ begin
 
  for p:=1 to MAXSEARCHFIELDS do
  begin
-  x:=0;
   if FindComponent('fieldscombobox'+IntToStr(p)) <> nil then
   begin
    with TComboBox(FindComponent('fieldscombobox'+IntToStr(p))) do
@@ -206,7 +203,6 @@ begin
     items.Assign(cmdnames);
     if cmdnames.Count > p-1 then itemindex:=p-1
     else itemindex:=0;
-    x:=itemindex;
    end;
   end;
   if FindComponent('opscombobox'+IntToStr(p)) <> nil then
@@ -222,11 +218,13 @@ begin
   begin
    with TTntEdit(FindComponent('term'+IntToStr(p))) do
    begin
+{
     if pos('AUTHOR',uppercase(zcmdkeys.Names[x])) > 0 then
-      text:=author
+      text:=tag
     else if pos('TITLE',uppercase(zcmdkeys.Names[x])) > 0 then
-      text:=title
+      text:=heading
     else
+}
       text:='';
    end;
   end;
@@ -318,9 +316,8 @@ begin
  sourcerec.SelLength:=0;
  FillCell(newresults, 0, 1, clWhite, clRed);
  newresults.Cells[0,0]:='#';
- newresults.Cells[1,0]:='Author';
- newresults.Cells[2,0]:='Title';
- newresults.Cells[3,0]:='PubYear';
+ newresults.Cells[1,0]:='Tag';
+ newresults.Cells[2,0]:='Heading';
  merged.Clear;
  merged_record:='';
 
@@ -341,7 +338,6 @@ end;
 procedure show_records;
 var  node : PZOOM_HOST;
      i : integer;
-     year : WideString;
 begin
  with zauthlocateform do
  begin
@@ -351,15 +347,9 @@ begin
   begin
    newresults.Cells[0,i+1]:=inttostr(i+1);
 //   errors.Lines.Add(utf8decode(node^.Records[(i*3)+2]));
-   get_author_title(node^.Records[(i*3)+2],node^.Records[(i*3)+1],author,title,true);
-   newresults.Cells[1,i+1]:=author;
-   newresults.Cells[2,i+1]:=title;
-   year:='';
-   if lowercase(node^.Records[(i*3)+1]) = 'usmarc' then
-    get_fieldtext(node^.Records[(i*3)+2],'260','c',year)
-   else if lowercase(node^.Records[(i*3)+1]) = 'unimarc' then
-    get_fieldtext(node^.Records[(i*3)+2],'210','d',year);
-   newresults.Cells[3,i+1]:=year;
+   get_main_heading(node^.Records[(i*3)+2],tag,heading);
+   newresults.Cells[1,i+1]:=tag;
+   newresults.Cells[2,i+1]:=heading;
    application.ProcessMessages;
   end;
  end;
@@ -434,7 +424,6 @@ if (Sender is TTntTreeView) then
         newresults.Cells[0,1]:='';
         newresults.Cells[1,1]:='';
         newresults.Cells[2,1]:='';
-        newresults.Cells[3,1]:='';
         label12.Caption:='No results.';
        end;
       end
@@ -444,7 +433,6 @@ if (Sender is TTntTreeView) then
        newresults.Cells[0,1]:='';
        newresults.Cells[1,1]:='';
        newresults.Cells[2,1]:='';
-       newresults.Cells[3,1]:='';
        label12.Caption:=node^.errorstring;
       end;
      end;
@@ -803,7 +791,6 @@ begin
  newresults.Cells[0,1]:='';
  newresults.Cells[1,1]:='';
  newresults.Cells[2,1]:='';
- newresults.Cells[3,1]:='';
  treeview1.Items.Clear;
 
  for p:=MAXHOSTS downto 1 do
@@ -953,9 +940,8 @@ var vwidth : integer;
 begin
   vwidth := newresults.Width-27;
   newresults.ColWidths[0] := round(vwidth * 0.05);
-  newresults.ColWidths[1] := round(vwidth * 0.3);
-  newresults.ColWidths[2] := round(vwidth * 0.5);
-  newresults.ColWidths[3] := round(vwidth * 0.15);
+  newresults.ColWidths[1] := round(vwidth * 0.15);
+  newresults.ColWidths[2] := round(vwidth * 0.8);
 end;
 
 procedure Tzauthlocateform.TntFormDestroy(Sender: TObject);

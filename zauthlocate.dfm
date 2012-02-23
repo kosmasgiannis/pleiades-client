@@ -258,7 +258,7 @@ object zauthlocateform: Tzauthlocateform
     Top = 8
     Width = 940
     Height = 225
-    ActivePage = TabSheet1
+    ActivePage = TabSheet2
     Anchors = [akLeft, akTop, akRight]
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -301,9 +301,9 @@ object zauthlocateform: Tzauthlocateform
         Visible = False
       end
       object term1: TTntEdit
-        Left = 400
+        Left = 456
         Top = 16
-        Width = 393
+        Width = 361
         Height = 22
         Font.Charset = GREEK_CHARSET
         Font.Color = clWindowText
@@ -315,7 +315,7 @@ object zauthlocateform: Tzauthlocateform
         OnChange = Button1Click
       end
       object truncationcheckbox1: TTntCheckBox
-        Left = 816
+        Left = 832
         Top = 16
         Width = 89
         Height = 17
@@ -345,7 +345,7 @@ object zauthlocateform: Tzauthlocateform
       object fieldscombobox1: TTntComboBox
         Left = 248
         Top = 16
-        Width = 145
+        Width = 201
         Height = 22
         Style = csDropDownList
         ItemHeight = 14
@@ -672,7 +672,7 @@ object zauthlocateform: Tzauthlocateform
         Width = 716
         Height = 145
         Anchors = [akLeft, akTop, akRight, akBottom]
-        ColCount = 4
+        ColCount = 3
         DefaultRowHeight = 14
         FixedCols = 0
         RowCount = 16
@@ -687,9 +687,8 @@ object zauthlocateform: Tzauthlocateform
         OnClick = newresultsClick
         ColWidths = (
           44
-          234
-          339
-          71)
+          63
+          583)
       end
     end
   end
