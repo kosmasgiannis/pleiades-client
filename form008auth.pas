@@ -105,7 +105,7 @@ begin
  maskedit20.Text:= copy(edit1.Text,34,1);
  maskedit21.Text:= copy(edit1.Text,35,4);
  maskedit22.Text:= copy(edit1.Text,39,1);
- maskedit22.Text:= copy(edit1.Text,40,1);
+ maskedit23.Text:= copy(edit1.Text,40,1);
  maskedit1.SetFocus;
  maskedit1.SelectAll;
 end;
