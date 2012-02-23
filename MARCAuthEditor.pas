@@ -57,6 +57,8 @@ type
     ComboBox1: TTntComboBox;
     TntLabel1: TTntLabel;
     TntBitBtn7: TTntBitBtn;
+    Locate1: TTntMenuItem;
+    N5: TTntMenuItem;
     procedure Return1Click(Sender: TObject);
     procedure Save1Click(Sender: TObject);
     procedure Delete1Click(Sender: TObject);
@@ -77,6 +79,7 @@ type
     procedure fullKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure TntFormShow(Sender: TObject);
+    procedure Locate1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -101,7 +104,8 @@ procedure Refresh_auth;
 implementation
 
 uses form008auth, MyAccess, ldr, MainUnit, DataUnit,  Math, EditMarcUnit,
-  StrUtils, WideIniClass, ProgresBarUnit, utility, GlobalProcedures;
+  StrUtils, WideIniClass, ProgresBarUnit, utility, GlobalProcedures,
+  zauthlocate;
 
 {$R *.dfm}
 
@@ -533,6 +537,24 @@ end;
 procedure TMARCAuthEditorform.TntFormShow(Sender: TObject);
 begin
   refresh_form;
+end;
+
+procedure TMARCAuthEditorform.Locate1Click(Sender: TObject);
+begin
+  zauthlocateform.myrecno := -1;
+  zauthlocateform.source_record := '';
+  if not data.auth.FieldByName('recno').IsNull then
+  begin
+    zauthlocateform.myrecno := data.auth.FieldByName('recno').Value;
+    zauthlocateform.calledfrom:='editor';
+    disp2mrc(full.Lines, zauthlocateform.source_record);
+    zauthlocateform.ShowModal;
+    if zauthlocateform.merged_record <> '' then
+    begin
+     full.Lines.Clear;
+     marcrecord2memo(zauthlocateform.merged_record, full);
+    end;
+  end;
 end;
 
 end.

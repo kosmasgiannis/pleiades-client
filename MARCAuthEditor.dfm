@@ -21,7 +21,7 @@ object MARCAuthEditorform: TMARCAuthEditorform
   OnShow = TntFormShow
   DesignSize = (
     894
-    673)
+    666)
   PixelsPerInch = 96
   TextHeight = 14
   object TntLabel1: TTntLabel
@@ -39,7 +39,7 @@ object MARCAuthEditorform: TMARCAuthEditorform
   end
   object StatusBar1: TTntStatusBar
     Left = 0
-    Top = 648
+    Top = 641
     Width = 894
     Height = 25
     Panels = <
@@ -644,6 +644,14 @@ object MARCAuthEditorform: TMARCAuthEditorform
       Caption = 'Arrange &tags'
       ShortCut = 16468
       OnClick = Arrangetags1Click
+    end
+    object N5: TTntMenuItem
+      Caption = '-'
+    end
+    object Locate1: TTntMenuItem
+      Caption = 'Locate'
+      ShortCut = 121
+      OnClick = Locate1Click
     end
   end
 end
