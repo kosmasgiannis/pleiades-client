@@ -118,6 +118,7 @@ procedure load_and_merge_record(dlg : TOpenDialog; memo : TTntMemo);
 procedure append_fields(source,stag:WideString; var dir: UTF8String; var dirpos : integer; var marcrec:WideString);
 function extract_field(s : WideString; f: WideString; which : integer; keepsfd : boolean) : WideString;
 procedure get_author_title(rec: UTF8String; format : string; var author, title:WideString; adddate : boolean);
+procedure get_main_heading(rec: UTF8String; var tag, heading:WideString);
 procedure get_controlfieldtext(rec : UTF8String; tag,posit : string; var text:WideString);
 procedure get_fieldtext(rec : UTF8String; tag,subfields : string; var text : WideString; which: integer = 0);
 function get_lang(rec,format : string):string;
@@ -2026,6 +2027,36 @@ begin
  end;
  author := extract_field(author,fields,0,false);
  title := extract_field(title,'a',0,false);
+end;
+
+procedure get_main_heading(rec: UTF8String; var tag, heading:WideString);
+var
+  i, fl,ind, base,nf : integer;
+  direntry : WideString;
+  junk,fields : string;
+begin
+ tag:='';  heading:='';
+
+ if rec = '' then exit;
+
+ junk := copy(rec,13,5);
+ if not TryStrToInt(junk, base) Then exit;
+
+ nf := (base-1-24)div 12;
+ fields := 'abcdefghijklmnopqrstuvwxyz';
+ for i:=1 to nf do
+ begin
+  direntry:=copy(rec,25+(i-1)*12,12);
+  fl := strtoint(copy(direntry,4,4));
+  ind := strtoint(copy(direntry,8,5));
+  if (copy(direntry,1,1) = '1') then
+  begin
+     tag := copy(direntry,1,3);
+     heading := UTF8StringToWideString(copy(rec,base+ind+3,fl-3));
+     break;
+  end;
+ end;
+ heading := extract_field(heading,fields,0,false);
 end;
 
 function merge_mrcs(source, retrieved : WideString): WideString;
