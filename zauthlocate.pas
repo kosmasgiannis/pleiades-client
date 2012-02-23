@@ -98,7 +98,7 @@ const MAXSEARCHFIELDS = 1;
 
 implementation
 
-uses form008, ldr, MainUnit, GlobalProcedures;
+uses form008auth, ldr, MainUnit, GlobalProcedures;
 
 {$R *.dfm}
 
@@ -563,10 +563,9 @@ begin
  if ((mater <>'MP') and (mater <>'VM') and (mater <> 'SE') and (mater <> 'AM') and (mater <> 'MU') and (mater <> 'MA')) then mater :='BK';
  if cl <> -1 then
  begin
-  eight.Edit1.text:=copy(merged.Lines[cl],7,length(merged.Lines[cl]));
-  eight.typeofmaterial:=mater;
-  eight.showmodal;
-  merged.Lines[cl] :='[008] '+eight.Edit1.text;
+  eightauth.Edit1.text:=copy(merged.Lines[cl],7,length(merged.Lines[cl]));
+  eightauth.showmodal;
+  merged.Lines[cl] :='[008] '+eightauth.Edit1.text;
  end;
 end;
 
@@ -633,7 +632,7 @@ begin
   if copy(merged.Lines[i],1,5) = '[LDR]' then begin cl := i; break; end;
  if cl <> -1 then
  begin
-  leaderform.record_type := 'bib';
+  leaderform.record_type := 'auth';
   leaderform.Edit1.text:=copy(merged.Lines[cl],7,length(merged.Lines[cl]));
   leaderform.showmodal;
   merged.Lines[cl] :='[LDR] '+leaderform.Edit1.text;
