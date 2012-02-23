@@ -1,0 +1,21 @@
+[Zgroups]
+LOC=01,02
+[00]
+name=test
+zurl=localhost:9999/journals
+proxy=
+format=USMARC
+scharset=Win-1253
+dcharset=Win-1253
+[01]
+name=LoC - Names
+zurl=lx2.loc.gov:210/NAF
+format=MARC21
+scharset=UTF8
+dcharset=UTF8
+[02]
+name=LoC - Subjects
+zurl=lx2.loc.gov:210/SAF
+format=MARC21
+scharset=UTF8
+dcharset=UTF8
