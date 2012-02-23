@@ -43,7 +43,7 @@ object zauthlocateform: Tzauthlocateform
     Top = 232
     Width = 940
     Height = 449
-    ActivePage = Retrievedsheet
+    ActivePage = mergedsheet
     Anchors = [akLeft, akTop, akRight, akBottom]
     Font.Charset = GREEK_CHARSET
     Font.Color = clWindowText
@@ -218,6 +218,7 @@ object zauthlocateform: Tzauthlocateform
         Anchors = [akTop, akRight]
         Caption = 'Filter'
         TabOrder = 2
+        Visible = False
         OnClick = Button1Click
       end
       object Button2: TTntButton
