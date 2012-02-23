@@ -152,7 +152,7 @@ begin
  tcodes.Clear;
 
  path:=extractfilepath(paramstr(0));
- myinifname := path+'ztargets.ini';
+ myinifname := path+'zauthtargets.ini';
  myinifname2 := path+'zparams.ini';
 
  zcmdkeys:=Tstringlist.Create;
@@ -182,7 +182,7 @@ begin
 
  with MyIniFile2 do
  begin
-  ReadSectionValues('Zcommands_descr.'+langcode,zcmdkeys);
+  ReadSectionValues('Zauthcommands_descr.'+langcode,zcmdkeys);
   for p:=0 to zcmdkeys.Count -1 do
    cmdnames.Add(zcmdkeys.ValueFromIndex[p]);
   // Add operators
@@ -677,7 +677,7 @@ begin
  full.Clear;
 
  path := ExtractFilePath(paramstr(0));
- myinifname := path+'ztargets.ini';
+ myinifname := path+'zauthtargets.ini';
  MyIniFile := TIniFile.Create(myinifname);
 
  cnt:=0;
@@ -728,7 +728,7 @@ begin
         dcharset:=UpperCase(readstring(junk,'dcharset','UTF8'));
         if dcharset='ADVANCE' then dcharset:='ADVANCEGREEK';
         if dcharset='ISO5428' then dcharset:='ISO5428:1984';
-        profile:=readstring(junk,'profile','Zcommands');
+        profile:=readstring(junk,'profile','Zauthcommands');
        end;
 
        h:=true;
@@ -757,7 +757,7 @@ begin
        database:=copy(database,2,length(database));
        if port= '' then port:='210';
        if database='' then database:='Default';
-       if profile='' then profile:='Zcommands';
+       if profile='' then profile:='Zauthcommands';
        cnt:=cnt+1;
        zoom_hosts[cnt].id:=junk;
        zoom_hosts[cnt].name:=name;
