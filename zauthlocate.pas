@@ -507,7 +507,7 @@ begin
 
   if disp2mrc(merged.Lines, merged_record) = 0 then
   begin
-   if not SyntaxCheck(merged.Lines,'bib') Then
+   if not SyntaxCheck(merged.Lines,'auth') Then
    begin
      WideShowMessage('You have a syntax error in this record. Please check.');
      Exit;
@@ -517,21 +517,21 @@ begin
 
    if lowercase(calledfrom) = 'main' then
    begin
-    if data.securebasket.Locate('recno', myrecno, []) Then
+    if data.auth.Locate('recno', myrecno, []) Then
     begin
-     EditTable(Data.securebasket);
+     EditTable(Data.auth);
 
-     Data.securebasket['Modifier'] := UserCode;
-     Data.securebasket['Modified'] := today;
-     data.securebasket.GetBlob('text').AsWideString := StringToWideString(RemoveHoldings(merged_record), Greek_codepage);
-     TBlobField(data.securebasket.FieldByName('text')).Modified := True;
+     Data.auth['Modifier'] := UserCode;
+     Data.auth['Modified'] := today;
+     Data.auth.GetBlob('text').AsWideString := StringToWideString(merged_record, Greek_codepage);
+     TBlobField(data.auth.FieldByName('text')).Modified := True;
 
-     text := WideStringToString(data.secureBasket.GetBlob('text').AsWideString, Greek_codepage);
-     PostTable(data.securebasket);
+     text := WideStringToString(data.auth.GetBlob('text').AsWideString, Greek_codepage);
+     PostTable(data.auth);
 
      merged.Clear;
      marcrecord2memo(text, merged);
-     RecordUpdated(myzebrahost, 'update', myrecno, MakeMRCFromSecureBasket(myrecno));
+     RecordUpdated(myzebraauthhost, 'update', myrecno, MakeMRCFromAuth(myrecno));
    end;
    end
    else if lowercase(calledfrom) = 'editor' then // called from MARCEditor
