@@ -112,7 +112,7 @@ begin
 
   KeyPreview := True;
   for i:=1 to MAXHOSTS do
-   zoom_hosts[i].Records := TTntstringlist.Create;
+   zoom_authhosts[i].Records := TTntstringlist.Create;
 end;
 
 procedure Tzauthlocateform.FormActivate(Sender: TObject);
@@ -132,7 +132,7 @@ begin
  author := remove_punctuation(author);
  title := remove_punctuation(title);
  for p:=1 to MAXHOSTS do
-  Zoom_Hosts[1].active:=false;
+  Zoom_authhosts[1].active:=false;
 
  current_format:='USmarc';
  pagecontrol1.ActivePageIndex:=0;
@@ -331,7 +331,7 @@ procedure Tzauthlocateform.FormClose(Sender: TObject;  var Action: TCloseAction)
 var p:integer;
 begin
  for p:=1 to MAXHOSTS do
-  zclose(zoom_hosts[p]);
+  zclose(zoom_authhosts[p]);
 
  zcmdkeys.Free;
  tnames.Free;
@@ -683,8 +683,8 @@ begin
  cnt:=0;
  for p:=1 to MAXHOSTS do
  begin
-  if zoom_hosts[p].active then zclose(zoom_hosts[p]);
-  zoom_hosts[p].active:=false;
+  if zoom_authhosts[p].active then zclose(zoom_authhosts[p]);
+  zoom_authhosts[p].active:=false;
  end;
 
  willsearch:=false;
@@ -759,26 +759,26 @@ begin
        if database='' then database:='Default';
        if profile='' then profile:='Zauthcommands';
        cnt:=cnt+1;
-       zoom_hosts[cnt].id:=junk;
-       zoom_hosts[cnt].name:=name;
-       zoom_hosts[cnt].host:=host;
-       zoom_hosts[cnt].port:=port;
-       zoom_hosts[cnt].database:=database;
-       zoom_hosts[cnt].proxy:=proxy;
-       zoom_hosts[cnt].userid:=userid;
-       zoom_hosts[cnt].password:=password;
-       zoom_hosts[cnt].groupid:=groupid;
-       zoom_hosts[cnt].active:=true;
-       zoom_hosts[cnt].errorcode:=0;
-       zoom_hosts[cnt].errorstring:='';
-       zoom_hosts[cnt].format:=format;
-       zoom_hosts[cnt].scharset:=scharset;
-       zoom_hosts[cnt].dcharset:=dcharset;
-       zoom_hosts[cnt].mark:=0;
-       zoom_hosts[cnt].hits:=0;
-       zoom_hosts[cnt].current_row:=-1;
-       zoom_hosts[cnt].Records.Clear;
-       zoom_hosts[cnt].profile:=profile;
+       zoom_authhosts[cnt].id:=junk;
+       zoom_authhosts[cnt].name:=name;
+       zoom_authhosts[cnt].host:=host;
+       zoom_authhosts[cnt].port:=port;
+       zoom_authhosts[cnt].database:=database;
+       zoom_authhosts[cnt].proxy:=proxy;
+       zoom_authhosts[cnt].userid:=userid;
+       zoom_authhosts[cnt].password:=password;
+       zoom_authhosts[cnt].groupid:=groupid;
+       zoom_authhosts[cnt].active:=true;
+       zoom_authhosts[cnt].errorcode:=0;
+       zoom_authhosts[cnt].errorstring:='';
+       zoom_authhosts[cnt].format:=format;
+       zoom_authhosts[cnt].scharset:=scharset;
+       zoom_authhosts[cnt].dcharset:=dcharset;
+       zoom_authhosts[cnt].mark:=0;
+       zoom_authhosts[cnt].hits:=0;
+       zoom_authhosts[cnt].current_row:=-1;
+       zoom_authhosts[cnt].Records.Clear;
+       zoom_authhosts[cnt].profile:=profile;
 
        pname := Ttreenode(al[alx]).Text;
     end;
@@ -808,7 +808,7 @@ begin
 
  for p:=MAXHOSTS downto 1 do
  begin
-  if zoom_hosts[p].active = true then
+  if zoom_authhosts[p].active = true then
   begin
 {}
 // HERE Build the query for each target
@@ -819,7 +819,7 @@ begin
    MyIniFile2 := TIniFile.Create(myinifname2);
    with MyIniFile2 do
    begin
-    ReadSectionValues(zoom_hosts[cnt].profile,cmds);
+    ReadSectionValues(zoom_authhosts[cnt].profile,cmds);
    end;
    myinifile2.free;
 
@@ -878,27 +878,27 @@ begin
 {}
    if (querystring <> '' ) then
    begin
-    pzh := @zoom_hosts[p];
-    errors.lines.add('h='+zoom_hosts[p].name+' z='+zoom_hosts[p].host+':'+zoom_hosts[p].port+'/'+zoom_hosts[p].database+' p='+zoom_hosts[p].proxy+' sch='+zoom_hosts[p].scharset+ ' q='+querystring);
-    i:= zsearch(zoom_hosts[p],querystring,strtointdef(timeoutedit.Text,30));
+    pzh := @zoom_authhosts[p];
+    errors.lines.add('h='+zoom_authhosts[p].name+' z='+zoom_authhosts[p].host+':'+zoom_authhosts[p].port+'/'+zoom_authhosts[p].database+' p='+zoom_authhosts[p].proxy+' sch='+zoom_authhosts[p].scharset+ ' q='+querystring);
+    i:= zsearch(zoom_authhosts[p],querystring,strtointdef(timeoutedit.Text,30));
     Application.ProcessMessages;
 
     if i = -1 then
     begin
-     errors.Lines.Add(zoom_hosts[p].errorstring);
-     treeview1.Items.AddobjectFirst(nil,inttostr(p)+' '+zoom_hosts[p].name+' (Error)',pzh);
+     errors.Lines.Add(zoom_authhosts[p].errorstring);
+     treeview1.Items.AddobjectFirst(nil,inttostr(p)+' '+zoom_authhosts[p].name+' (Error)',pzh);
     end
     else
     begin
      totalrecords:=totalrecords+i;
-     errors.Lines.Add(inttostr(i)+' records found in '+zoom_hosts[p].name);
+     errors.Lines.Add(inttostr(i)+' records found in '+zoom_authhosts[p].name);
      label8.Caption:='Total '+inttostr(totalrecords)+' records found. Please wait...';
      zauthlocateform.Invalidate;
      zauthlocateform.Repaint;
-     treeview1.Items.AddobjectFirst(nil,inttostr(p)+' '+zoom_hosts[p].name+' ('+inttostr(i)+')',pzh);
-     if zoom_hosts[p].errorstring <> '' then
+     treeview1.Items.AddobjectFirst(nil,inttostr(p)+' '+zoom_authhosts[p].name+' ('+inttostr(i)+')',pzh);
+     if zoom_authhosts[p].errorstring <> '' then
      begin
-      errors.Lines.Add(zoom_hosts[p].errorstring);
+      errors.Lines.Add(zoom_authhosts[p].errorstring);
      end;
     end;
    end;

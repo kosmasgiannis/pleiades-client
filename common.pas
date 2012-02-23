@@ -87,6 +87,7 @@ var
 ZOOM_INITIALIZED : Boolean;
 
 Zoom_Hosts : array[1..MAXHOSTS] of ZOOM_HOST;
+Zoom_AuthHosts : array[1..MAXHOSTS] of ZOOM_HOST;
 myzebraauthhost, myzebrahost : ZOOM_HOST;
 
 function koha_item_type(ldr : string) : string;
