@@ -517,6 +517,7 @@ begin
 
    if lowercase(calledfrom) = 'main' then
    begin
+    OpenAuthTable(myrecno);
     if data.auth.Locate('recno', myrecno, []) Then
     begin
      EditTable(Data.auth);
