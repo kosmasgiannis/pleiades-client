@@ -13,9 +13,11 @@ zurl=lx2.loc.gov:210/NAF
 format=MARC21
 scharset=UTF8
 dcharset=UTF8
+profile=ZauthNAFcommands
 [02]
 name=LoC - Subjects
 zurl=lx2.loc.gov:210/SAF
 format=MARC21
 scharset=UTF8
 dcharset=UTF8
+profile=ZauthSAFcommands
