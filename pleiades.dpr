@@ -25,6 +25,7 @@ uses
   zlookup in 'zlookup.pas' {zlookupform},
   zlocate in 'zlocate.pas' {zlocateform},
   zauthlocate in 'zauthlocate.pas' {zauthlocateform},
+  zauthlookup in 'zauthlookup.pas' {zauthlookupform},
   zoomit in 'zoomit.pas',
   zoom in 'zoom.pas',
   EditMarcUnit in 'EditMarcUnit.pas' {EditMarcForm},
@@ -103,6 +104,7 @@ begin
   Application.CreateForm(Tzlookupform, zlookupform);
   Application.CreateForm(Tzlocateform, zlocateform);
   Application.CreateForm(Tzauthlocateform, zauthlocateform);
+  Application.CreateForm(Tzauthlookupform, zauthlookupform);
   Application.CreateForm(TEditMarcForm, EditMarcForm);
   Application.CreateForm(TDefClnSettingsForm, DefClnSettingsForm);
   Application.CreateForm(TZTargetsSettingsForm, ZTargetsSettingsForm);
