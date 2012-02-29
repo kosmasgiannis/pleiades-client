@@ -131,7 +131,7 @@ begin
  get_main_heading(source_record,tag,heading);
  heading := remove_punctuation(heading);
  for p:=1 to MAXHOSTS do
-  Zoom_authhosts[1].active:=false;
+  Zoom_authhosts[p].active:=false;
 
  current_format:='USmarc';
  pagecontrol1.ActivePageIndex:=0;
