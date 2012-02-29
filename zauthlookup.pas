@@ -15,7 +15,6 @@ type
     errors: TTntMemo;
     truncationcheckbox1: TTntCheckBox;
     Label8: TTntLabel;
-    ListBox3: TTntListBox;
     newresults: TTntStringGrid;
     Label11: TTntLabel;
     Label12: TTntLabel;
@@ -23,34 +22,35 @@ type
     full: TTntMemo;
     Label4: TTntLabel;
     ImageList1: TImageList;
-    BitBtn2: TTntBitBtn;
-    BitBtn3: TTntBitBtn;
+    clearbutton: TTntBitBtn;
+    lookupbutton: TTntBitBtn;
     nextrecs: TTntBitBtn;
     prevrecs: TTntBitBtn;
-    BitBtn1: TTntBitBtn;
-    TntBitBtn1: TTntBitBtn;
+    useheadingbutton: TTntBitBtn;
+    cancelbutton: TTntBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure ListBox3Click(Sender: TObject);
     procedure TreeView1MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure newresultsClick(Sender: TObject);
-    procedure BitBtn3Click(Sender: TObject);
-    procedure BitBtn2Click(Sender: TObject);
-    procedure TntTreeView1MouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure lookupbuttonClick(Sender: TObject);
+    procedure clearbuttonClick(Sender: TObject);
     procedure TntFormPaint(Sender: TObject);
     procedure TntFormResize(Sender: TObject);
-    procedure TntFormDestroy(Sender: TObject);
+    procedure nextrecsClick(Sender: TObject);
+    procedure prevrecsClick(Sender: TObject);
+    procedure useheadingbuttonClick(Sender: TObject);
+    procedure cancelbuttonClick(Sender: TObject);
+    procedure getrecords;
   private
     { Private declarations }
   public
     { Public declarations }
     //globalproxy,
-    current_format, tag, heading: WideString;
-    source_record, merged_record, located_record : UTF8String;
+    tag, heading: WideString;
+    source_record : UTF8String;
     myrecno : integer;
     calledfrom : string;
     totalrecords, displayedrecords:integer;
@@ -58,8 +58,8 @@ type
     cmds,     // RPN commands attributes.
     ops,      // boolean operands names.
     zcmdkeys, // internal presentation of search commands.
-    keys , tcodes, tnames: TStrings;
-    selected_targets : TtntStrings;
+    keys : TStrings;
+    recordset : TTntStrings;
   end;
 
 var
@@ -69,40 +69,44 @@ const MAXSEARCHFIELDS = 1;
 
 implementation
 
-uses form008auth, ldr, MainUnit, GlobalProcedures;
+uses MainUnit, GlobalProcedures;
 
 {$R *.dfm}
 
 procedure FillCell(SG : TStringGrid; Col, Row : Integer; BkCol, TextCol : TColor); forward;
 
 procedure Tzauthlookupform.FormCreate(Sender: TObject);
-var i : integer;
 begin
- selected_targets:=TtntStringlist.Create;
- selected_targets.Clear;
-
   KeyPreview := True;
-  for i:=1 to MAXHOSTS do
-   zoom_authhosts[i].Records := TTntstringlist.Create;
+  recordset := TTntstringlist.Create;
 end;
 
 procedure Tzauthlookupform.FormActivate(Sender: TObject);
 var
-  //i,
-  p,x : integer;
-//  ptr : Pointer;
-  tno, langcode, path, myinifname, myinifname2, hlp : string;
-  myIniFile, myIniFile2 : TIniFile;
+  p : integer;
+  langcode, path, myinifname2, hlp : string;
+  myIniFile2 : TIniFile;
 begin
- label11.Caption:='';
- label12.Caption:='';
-
- get_main_heading(source_record,tag,heading);
+ label11.Caption := '';
+ label12.Caption := '';
+ tag := '100';
+ heading := 'Kosmas';
  heading := remove_punctuation(heading);
- for p:=1 to MAXHOSTS do
-  Zoom_authhosts[1].active:=false;
 
- current_format:='USmarc';
+ zoom_authhosts[1].name:='MyZebraAuthDatabase';
+ zoom_authhosts[1].host:=FastRecordCreator.myzebraauthhostname;
+ zoom_authhosts[1].port:=FastRecordCreator.myzebraauthport;
+ zoom_authhosts[1].database:=FastRecordCreator.myzebraauthdatabase;
+ zoom_authhosts[1].proxy:=FastRecordCreator.myzproxy;
+ zoom_authhosts[1].active:=false;
+ zoom_authhosts[1].errorcode:=0;
+ zoom_authhosts[1].errorstring:='';
+ zoom_authhosts[1].format:='Usmarc';
+ zoom_authhosts[1].scharset:=UpperCase(FastRecordCreator.myzcharset);
+ zoom_authhosts[1].dcharset:=UpperCase(FastRecordCreator.myzcharset);
+ zoom_authhosts[1].profile:=FastRecordCreator.myzauthprofile;
+ zoom_authhosts[1].mark:=0;
+ zoom_authhosts[1].hits:=0;
  label8.Caption:='';
  newresults.RowCount:=2;
  newresults.Cells[0,1]:='';
@@ -111,13 +115,8 @@ begin
 
  keys:=Tstringlist.Create;
  keys.Clear;
- tnames:=Tstringlist.Create;
- tnames.Clear;
- tcodes:=Tstringlist.Create;
- tcodes.Clear;
 
  path:=extractfilepath(paramstr(0));
- myinifname := path+'zauthtargets.ini';
  myinifname2 := path+'zparams.ini';
 
  zcmdkeys:=Tstringlist.Create;
@@ -128,26 +127,11 @@ begin
  ops.Clear;
 
  langcode:='en';
- MyIniFile := TIniFile.Create(myinifname);
  MyIniFile2 := TIniFile.Create(myinifname2);
- with MyIniFile do
- begin
-  ReadSections(tcodes);
-  for p:=tcodes.Count -1 downto 0 do
-  begin
-   if lowercase(tcodes[p]) = 'zgroups' then
-    tcodes.Delete(p);
-  end;
-  for p:=0 to tcodes.Count -1 do
-  begin
-    hlp:=ReadString(tcodes[p],'name','Unknown');
-    tnames.Add(hlp);
-  end;
- end;
 
  with MyIniFile2 do
  begin
-  ReadSectionValues('Zauthcommands_descr.'+langcode,zcmdkeys);
+  ReadSectionValues('myzebauthcommands_descr.'+langcode,zcmdkeys);
   for p:=0 to zcmdkeys.Count -1 do
    cmdnames.Add(zcmdkeys.ValueFromIndex[p]);
   // Add operators
@@ -158,7 +142,6 @@ begin
   hlp:=ReadString('Zops.'+langcode,'@not','And Not');
   ops.Add(hlp);
  end;
-
 
  for p:=1 to MAXSEARCHFIELDS do
  begin
@@ -185,14 +168,7 @@ begin
   begin
    with TTntEdit(FindComponent('term'+IntToStr(p))) do
    begin
-{
-    if pos('AUTHOR',uppercase(zcmdkeys.Names[x])) > 0 then
-      text:=tag
-    else if pos('TITLE',uppercase(zcmdkeys.Names[x])) > 0 then
-      text:=heading
-    else
-}
-      text:='';
+     text:='';
    end;
   end;
   if FindComponent('truncationcheckbox'+IntToStr(p)) <> nil then
@@ -206,56 +182,9 @@ begin
  cmdnames.Free;
  ops.Free;
 
- with listbox1 do
- begin
-  Items.Clear;
-  Items.Assign(tnames);
-  Itemindex:=0;
- end;
-
  keys.Clear;
- tnames.Clear;
- with MyIniFile do
- begin
-  ReadSection('Zgroups',keys);
-  for p:=0 to keys.Count -1 do
-  begin
-   tnames.Add(ReadString('Zgroups',keys[p],''));
-  end;
- end;
-
- with listbox3 do
- begin
-  Items.Clear;
-  Items.Assign(keys);
-  Itemindex:=0;
- end;
-// i:=0;
-
- for p:=0 to keys.Count-1 do
- begin
-//  i:=tnttreeview1.Items.Count-1;
-  hlp:=tnames[p];
-  hlp:=hlp+',';
-  repeat
-   x:=pos(',',hlp);
-   tno:=copy(hlp,1,x-1);
-   hlp:=copy(hlp,x+1,length(hlp));
-   for x:=0 to tcodes.Count-1 do
-   begin
-    if tcodes[x]=tno then
-    begin
-      //ptr := getzoomhostbyid(tno);
-//      tnttreeview1.Items.Addchildobject(tnttreeview1.Items[i],listbox1.Items[x],nil);
-//      showmessage('Adding '+listbox1.Items[x]+' to '+keys[p]+' code='+tno);
-    end;
-   end;
-  until hlp='';
- end;
-
  keys.Free;
 
- MyIniFile.Free;
  MyIniFile2.Free;
  errors.Lines.Clear;
  full.Lines.Clear;
@@ -264,33 +193,27 @@ begin
  newresults.Cells[1,0]:='Tag';
  newresults.Cells[2,0]:='Heading';
 
+ term1.Text := heading;
  ActiveControl := term1;
 end;
 
 procedure Tzauthlookupform.FormClose(Sender: TObject;  var Action: TCloseAction);
-var p:integer;
 begin
- for p:=1 to MAXHOSTS do
-  zclose(zoom_authhosts[p]);
-
+ zclose(zoom_authhosts[1]);
  zcmdkeys.Free;
- tnames.Free;
- tcodes.Free;
 end;
 
 procedure show_records;
-var  node : PZOOM_HOST;
-     i : integer;
+var i : integer;
 begin
  with zauthlookupform do
  begin
-//  node:=PZOOM_HOST(TreeView1.Selected.Data);
-  newresults.RowCount:=(node^.Records.Count div 3)+1;
-  for i:=0 to ((node^.Records.Count div 3)-1) do
+  newresults.RowCount:=(recordset.Count div 3)+1;
+  for i:=0 to ((recordset.Count div 3)-1) do
   begin
    newresults.Cells[0,i+1]:=inttostr(i+1);
-//   errors.Lines.Add(utf8decode(node^.Records[(i*3)+2]));
-   get_main_heading(node^.Records[(i*3)+2],tag,heading);
+//   errors.Lines.Add(utf8decode(recordset[(i*3)+2]));
+   get_main_heading(recordset[(i*3)+2],tag,heading);
    newresults.Cells[1,i+1]:=tag;
    newresults.Cells[2,i+1]:=heading;
    application.ProcessMessages;
@@ -342,7 +265,7 @@ if (Sender is TTntTreeView) then
            end;
          end;
         end;
-        if rc >= 0 then 
+        if rc >= 0 then
         begin
           show_records;
           if (node^.current_row = -1) then
@@ -350,13 +273,12 @@ if (Sender is TTntTreeView) then
           newresults.Row:=node^.current_row;
           full.lines.Clear;
           marcrecord2memo(node^.Records[((newresults.Row-1)*3)+2], full);
-          current_format:= node^.Records[((newresults.Row-1)*3)+1];
           full.SelStart:=0;
           full.SelLength:=0;
 
           label12.Caption:='Showing 1-'+inttostr(node^.mark)+' of '+inttostr(node^.hits);
          end
-         else 
+         else
            errors.Lines.Add('Error retrieving records from '+node^.name+'.');
        end
        else
@@ -382,6 +304,73 @@ if (Sender is TTntTreeView) then
 
 end;
 
+procedure Tzauthlookupform.getrecords;
+var
+  rc : integer;
+begin
+  label11.Caption:=zoom_authhosts[1].name+' ('+zoom_authhosts[1].format+') ';
+  label12.Caption:='';
+  full.Clear;
+  if zoom_authhosts[1].errorcode = 0 then
+  begin
+   if zoom_authhosts[1].hits <> 0 then
+   begin
+    rc := 0;
+    if (zoom_authhosts[1].mark < zoom_authhosts[1].hits) then
+    begin
+     label12.Caption:='Please wait...';
+     application.processmessages;
+     rc := zpresent(zoom_authhosts[1],15,recordset,'F');
+     if rc < 0 then
+     begin
+       if rc = -1 then
+        errors.Lines.Add('Out of memory')
+       else if rc = -2 then
+       begin
+        errors.Lines.Add('Connection to host '+zoom_authhosts[1].name+' lost. Resuming...');
+        if zresume_search(zoom_authhosts[1]) <> -1 then
+        begin
+          rc := zpresent(zoom_authhosts[1],15,recordset,'F');
+        end
+        else
+          errors.Lines.Add('Error connecting to '+zoom_authhosts[1].name+'.');
+       end;
+     end;
+    end;
+    if rc >= 0 then
+    begin
+      show_records;
+      if (zoom_authhosts[1].current_row = -1) then
+        zoom_authhosts[1].current_row:=1;
+      newresults.Row:=zoom_authhosts[1].current_row;
+      full.lines.Clear;
+      marcrecord2memo(recordset[((newresults.Row-1)*3)+2], full);
+      full.SelStart:=0;
+      full.SelLength:=0;
+      label12.Caption:='Showing 1-'+inttostr(zoom_authhosts[1].mark)+' of '+inttostr(zoom_authhosts[1].hits);
+    end
+    else
+      errors.Lines.Add('Error retrieving records from '+zoom_authhosts[1].name+'.');
+    end
+    else
+    begin
+      newresults.RowCount := 2;
+      newresults.Cells[0,1]:='';
+      newresults.Cells[1,1]:='';
+      newresults.Cells[2,1]:='';
+      label12.Caption:='No results.';
+    end;
+   end
+   else
+   begin
+     newresults.RowCount := 2;
+     newresults.Cells[0,1]:='';
+     newresults.Cells[1,1]:='';
+     newresults.Cells[2,1]:='';
+     label12.Caption:=zoom_authhosts[1].errorstring;
+   end;
+end;
+
 procedure Tzauthlookupform.FormKeyPress(Sender: TObject; var Key: Char);
 var p:integer;
     acontrol: string;
@@ -396,7 +385,7 @@ begin
         ('opscombobox'+inttostr(p) = acontrol) or ('truncationcheckbox'+inttostr(p) = acontrol)
     ) then
     begin
-     BitBtn3Click(Sender);
+     LookupbuttonClick(Sender);
      exit;
     end;
    end;
@@ -416,53 +405,15 @@ begin
  end;
 end;
 
-
-
-
-procedure Tzauthlookupform.ListBox3Click(Sender: TObject);
-var i,p:integer;
-    hlp,tno:string;
-begin
- for p:=0 to listbox1.Items.Count-1 do
-  listbox1.Selected[p]:=false;
- for i := 0 to listbox3.Items.Count-1 do
- begin
-  if listbox3.Selected[i] then
-  begin
-   hlp:=tnames[i];
-   hlp:=hlp+',';
-   repeat
-    p:=pos(',',hlp);
-    tno:=copy(hlp,1,p-1);
-    hlp:=copy(hlp,p+1,length(hlp));
-    for p:=0 to tcodes.Count-1 do
-    begin
-     if tcodes[p]=tno then listbox1.Selected[p]:=true;
-    end;
-   until hlp='';
-  end;
- end;
- listbox1.itemindex:=0;
-end;
-
 procedure Tzauthlookupform.newresultsClick(Sender: TObject);
-var  node : PZOOM_HOST;
 begin
-// node:=PZOOM_HOST(TreeView1.Selected.Data);
- if node^.hits > 0 then
+ if zoom_authhosts[1].hits > 0 then
  begin
-  node^.current_row:=newresults.Row;
+  zoom_authhosts[1].current_row:=newresults.Row;
   full.lines.Clear;
-  if node^.Records[((newresults.Row-1)*3)+2] <> '' then
+  if recordset[((newresults.Row-1)*3)+2] <> '' then
   begin
-    marcrecord2memo(node^.Records[((newresults.Row-1)*3)+2], full);
-    current_format:= node^.Records[((newresults.Row-1)*3)+1];
-    if uppercase(current_format) = 'UNIMARC' then
-    begin
-     if fileexists(extractfilepath(paramstr(0))+'\uni2us\uni2us.ini') then
-    end
-    else
-
+    marcrecord2memo(recordset[((newresults.Row-1)*3)+2], full);
     full.SelStart:=0;
     full.SelLength:=0;
   end;
@@ -474,138 +425,37 @@ begin
   Result := CompareText(Ttreenode(Item1).Text, Ttreenode(Item2).Text);
 end;
 
-procedure Tzauthlookupform.BitBtn3Click(Sender: TObject);
-var al : Tlist;
-    alx: integer;
-    pname : string;
+procedure Tzauthlookupform.lookupbuttonClick(Sender: TObject);
+var
   querystring, q1, q2, s1, t1 : WideString;
   error : WideString;
-  cnt, i, p, pp, itidx : integer;
-  h, m, willsearch : boolean;
-  userid,password,groupid,proxy, name, junk, host, port, database, target, dcharset,
-  scharset, format, profile : string;
-  ch : char;
-  pzh : PZOOM_HOST;
-  myinifname, myinifname2, path : string;
-  myinifile, myinifile2 : TIniFile;
+  i, pp, itidx : integer;
+  name, junk : string;
+  myinifname2, path : string;
+  myinifile2 : TIniFile;
 begin
  label11.Caption:='';
  label12.Caption:='';
  full.Clear;
 
  path := ExtractFilePath(paramstr(0));
- myinifname := path+'zauthtargets.ini';
- MyIniFile := TIniFile.Create(myinifname);
 
- cnt:=0;
- for p:=1 to MAXHOSTS do
- begin
-  if zoom_authhosts[p].active then zclose(zoom_authhosts[p]);
-  zoom_authhosts[p].active:=false;
- end;
+ if zoom_authhosts[1].active then zclose(zoom_authhosts[1]);
 
- willsearch:=false;
+ zoom_authhosts[1].id:=junk;
+ zoom_authhosts[1].name:=name;
+ zoom_authhosts[1].userid:='';
+ zoom_authhosts[1].password:='';
+ zoom_authhosts[1].groupid:='';
+ zoom_authhosts[1].active:=true;
+ zoom_authhosts[1].errorcode:=0;
+ zoom_authhosts[1].errorstring:='';
+ zoom_authhosts[1].format:='USMARC';
+ zoom_authhosts[1].mark:=0;
+ zoom_authhosts[1].hits:=0;
+ zoom_authhosts[1].current_row:=-1;
+ recordset.Clear;
 
- al:=Tlist.Create;
- al.Clear;
- pname:='';
- al.Sort(comparenames);
- for alx:=0 to al.Count-1 do
- begin
-   if Ttreenode(al[alx]).HasChildren = false then
-   begin
-    if pname <> Ttreenode(al[alx]).Text then
-    begin
-   //    showmessage(Ttreenode(al[alx]).Text+' '+tcodes[listbox1.items.IndexOf(Ttreenode(al[alx]).Text)+1]);
-
-       willsearch:=true;
-       name:=Ttreenode(al[alx]).Text;
-       junk:=tcodes[listbox1.items.IndexOf(Ttreenode(al[alx]).Text)];
-       target:='';
-       format:='';
-       scharset:='';
-       dcharset:='';
-       proxy:='';
-       userid:='';
-       password:='';
-       groupid:='';
-       profile:='';
-
-       with myinifile do
-       begin
-        target:=readstring(junk,'zurl','');
-        format:=readstring(junk,'format','USMARC');
-        proxy:=readstring(junk,'proxy','');
-        userid:=readstring(junk,'userid','');
-        password:=readstring(junk,'password','');
-        groupid:=readstring(junk,'groupid','');
-        scharset:=UpperCase(readstring(junk,'scharset','UTF8'));
-        dcharset:=UpperCase(readstring(junk,'dcharset','UTF8'));
-        if dcharset='ADVANCE' then dcharset:='ADVANCEGREEK';
-        if dcharset='ISO5428' then dcharset:='ISO5428:1984';
-        profile:=readstring(junk,'profile','Zauthcommands');
-       end;
-
-       h:=true;
-       m:=true;
-       host:='';
-       port:='';
-       database:='';
-
-       for i:=1 to length(target) do
-       begin
-        ch:=target[i];
-        if (ch = ':') then
-        begin
-         h:=false;
-        end;
-        if (ch='/') then
-        begin
-         m:=false;
-        end;
-        if h then host:=host+ch;
-        if ((not h) and m) then port:=port+ch;
-        if ((not h) and (not m)) then database:=database+ch;
-       end;
-
-       port:=copy(port,2,length(port));
-       database:=copy(database,2,length(database));
-       if port= '' then port:='210';
-       if database='' then database:='Default';
-       if profile='' then profile:='Zauthcommands';
-       cnt:=cnt+1;
-       zoom_authhosts[cnt].id:=junk;
-       zoom_authhosts[cnt].name:=name;
-       zoom_authhosts[cnt].host:=host;
-       zoom_authhosts[cnt].port:=port;
-       zoom_authhosts[cnt].database:=database;
-       zoom_authhosts[cnt].proxy:=proxy;
-       zoom_authhosts[cnt].userid:=userid;
-       zoom_authhosts[cnt].password:=password;
-       zoom_authhosts[cnt].groupid:=groupid;
-       zoom_authhosts[cnt].active:=true;
-       zoom_authhosts[cnt].errorcode:=0;
-       zoom_authhosts[cnt].errorstring:='';
-       zoom_authhosts[cnt].format:=format;
-       zoom_authhosts[cnt].scharset:=scharset;
-       zoom_authhosts[cnt].dcharset:=dcharset;
-       zoom_authhosts[cnt].mark:=0;
-       zoom_authhosts[cnt].hits:=0;
-       zoom_authhosts[cnt].current_row:=-1;
-       zoom_authhosts[cnt].Records.Clear;
-       zoom_authhosts[cnt].profile:=profile;
-
-       pname := Ttreenode(al[alx]).Text;
-    end;
-   end;
- end;
- al.Free;
-
-
- if willsearch = false then
- begin
-  exit;
- end;
  errors.Clear;
 
  label8.Caption:='Please wait...';
@@ -617,11 +467,6 @@ begin
  newresults.Cells[1,1]:='';
  newresults.Cells[2,1]:='';
 
- for p:=MAXHOSTS downto 1 do
- begin
-  if zoom_authhosts[p].active = true then
-  begin
-{}
 // HERE Build the query for each target
 
    cmds:=Tstringlist.Create;
@@ -630,11 +475,12 @@ begin
    MyIniFile2 := TIniFile.Create(myinifname2);
    with MyIniFile2 do
    begin
-    ReadSectionValues(zoom_authhosts[cnt].profile,cmds);
+    ReadSectionValues(zoom_authhosts[1].profile,cmds);
    end;
    myinifile2.free;
-
-   querystring := ''; error:='';
+   errors.Lines.Add('Start');
+   querystring := '';
+   error:='';
    s1:='';
    for pp:=1 to MAXSEARCHFIELDS do
    begin
@@ -684,72 +530,42 @@ begin
     end;  // term exist
    end;  //for
    cmds.Free;
-
 // Query is ready
 {}
    if (querystring <> '' ) then
    begin
-    pzh := @zoom_authhosts[p];
-    errors.lines.add('h='+zoom_authhosts[p].name+' z='+zoom_authhosts[p].host+':'+zoom_authhosts[p].port+'/'+zoom_authhosts[p].database+' p='+zoom_authhosts[p].proxy+' sch='+zoom_authhosts[p].scharset+ ' q='+querystring);
-    i:= zsearch(zoom_authhosts[p],querystring,30);
+    errors.lines.add('h='+zoom_authhosts[1].name+' z='+zoom_authhosts[1].host+':'+zoom_authhosts[1].port+'/'+zoom_authhosts[1].database+' p='+zoom_authhosts[1].proxy+' sch='+zoom_authhosts[1].scharset+ ' q='+querystring);
+    i:= zsearch(zoom_authhosts[1],querystring,30);
     Application.ProcessMessages;
 
     if i = -1 then
     begin
-     errors.Lines.Add(zoom_authhosts[p].errorstring);
-     //treeview1.Items.AddobjectFirst(nil,inttostr(p)+' '+zoom_authhosts[p].name+' (Error)',pzh);
+     errors.Lines.Add(zoom_authhosts[1].errorstring);
     end
     else
     begin
      totalrecords:=totalrecords+i;
-     errors.Lines.Add(inttostr(i)+' records found in '+zoom_authhosts[p].name);
+     errors.Lines.Add(inttostr(i)+' records found in '+zoom_authhosts[1].name);
      label8.Caption:='Total '+inttostr(totalrecords)+' records found. Please wait...';
      zauthlookupform.Invalidate;
      zauthlookupform.Repaint;
-     //treeview1.Items.AddobjectFirst(nil,inttostr(p)+' '+zoom_authhosts[p].name+' ('+inttostr(i)+')',pzh);
-     if zoom_authhosts[p].errorstring <> '' then
+     if zoom_authhosts[1].errorstring <> '' then
      begin
-      errors.Lines.Add(zoom_authhosts[p].errorstring);
+      errors.Lines.Add(zoom_authhosts[1].errorstring);
      end;
     end;
    end;
-  end;
- end;
 
  label8.Caption:='';
  newresults.SetFocus;
 end;
 
-procedure Tzauthlookupform.BitBtn2Click(Sender: TObject);
+procedure Tzauthlookupform.clearbuttonClick(Sender: TObject);
 var pp : integer;
 begin
   for pp:=1 to MAXSEARCHFIELDS do
    if (FindComponent('term'+IntToStr(pp)) <> nil) then
     TTntEdit(FindComponent('term'+IntToStr(pp))).Text:= '';
-end;
-
-procedure Tzauthlookupform.TntTreeView1MouseDown(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var t,tn:TTntTreeNode;
-  HT: THitTests;
-begin
-//  HT := tntTreeView1.GetHitTestInfoAt(X, Y);
-//  tn := tnttreeview1.GetNodeAt(X,Y);
-  if (htOnItem in HT) then
-  begin
-    if tn.HasChildren then
-    begin
-     if (ssAlt in Shift) then
-     begin
-      t:=tn.getFirstChild;
-      while t <> nil do
-      begin
-//       tnttreeview1.Select(t,[ssCtrl]);
-       t:=tn.getNextChild(t);
-      end;
-     end;
-    end;
-  end;
 end;
 
 procedure Tzauthlookupform.TntFormPaint(Sender: TObject);
@@ -767,9 +583,24 @@ begin
   newresults.ColWidths[2] := round(vwidth * 0.8);
 end;
 
-procedure Tzauthlookupform.TntFormDestroy(Sender: TObject);
+procedure Tzauthlookupform.nextrecsClick(Sender: TObject);
 begin
-  selected_targets.Free;
+//
+end;
+
+procedure Tzauthlookupform.prevrecsClick(Sender: TObject);
+begin
+//
+end;
+
+procedure Tzauthlookupform.useheadingbuttonClick(Sender: TObject);
+begin
+//
+end;
+
+procedure Tzauthlookupform.cancelbuttonClick(Sender: TObject);
+begin
+// zcmdkeys.Free;
 end;
 
 end.

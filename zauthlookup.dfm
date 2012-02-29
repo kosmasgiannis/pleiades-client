@@ -10,13 +10,13 @@ object zauthlookupform: Tzauthlookupform
   Font.Height = -11
   Font.Name = 'Arial'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poMainFormCenter
   Scaled = False
   OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
-  OnDestroy = TntFormDestroy
   OnKeyPress = FormKeyPress
   OnPaint = TntFormPaint
   OnResize = TntFormResize
@@ -27,7 +27,7 @@ object zauthlookupform: Tzauthlookupform
   TextHeight = 14
   object Label4: TTntLabel
     Left = 9
-    Top = 448
+    Top = 456
     Width = 59
     Height = 14
     Caption = 'Full record'
@@ -39,8 +39,8 @@ object zauthlookupform: Tzauthlookupform
     ParentFont = False
   end
   object Label8: TTntLabel
-    Left = 2
-    Top = 2
+    Left = 8
+    Top = 32
     Width = 3
     Height = 14
     Font.Charset = DEFAULT_CHARSET
@@ -53,7 +53,7 @@ object zauthlookupform: Tzauthlookupform
   object Label12: TTntLabel
     Left = 8
     Top = 48
-    Width = 9
+    Width = 6
     Height = 14
     Caption = '[]'
   end
@@ -66,9 +66,9 @@ object zauthlookupform: Tzauthlookupform
   end
   object full: TTntMemo
     Left = 8
-    Top = 464
+    Top = 472
     Width = 697
-    Height = 273
+    Height = 265
     Anchors = [akLeft, akTop, akRight, akBottom]
     Font.Charset = GREEK_CHARSET
     Font.Color = clWindowText
@@ -96,9 +96,9 @@ object zauthlookupform: Tzauthlookupform
     Left = 8
     Top = 368
     Width = 697
-    Height = 73
+    Height = 81
     TabStop = False
-    Anchors = [akLeft, akTop, akRight, akBottom]
+    Anchors = [akLeft, akTop, akRight]
     Font.Charset = GREEK_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -113,8 +113,8 @@ object zauthlookupform: Tzauthlookupform
     Left = 8
     Top = 120
     Width = 697
-    Height = 249
-    Anchors = [akLeft, akTop, akRight, akBottom]
+    Height = 245
+    Anchors = [akLeft, akTop, akRight]
     ColCount = 3
     DefaultRowHeight = 14
     FixedCols = 0
@@ -133,12 +133,12 @@ object zauthlookupform: Tzauthlookupform
       63
       583)
   end
-  object BitBtn3: TTntBitBtn
+  object lookupbutton: TTntBitBtn
     Left = 491
     Top = 32
     Width = 185
     Height = 25
-    Caption = 'Locate'
+    Caption = 'Lookup'
     Font.Charset = GREEK_CHARSET
     Font.Color = clWindowText
     Font.Height = -10
@@ -146,7 +146,7 @@ object zauthlookupform: Tzauthlookupform
     Font.Style = []
     ParentFont = False
     TabOrder = 4
-    OnClick = BitBtn3Click
+    OnClick = lookupbuttonClick
     Glyph.Data = {
       7E0B0000424D7E0B000000000000360000002800000026000000130000000100
       200000000000480B0000120B0000120B00000000000000000000D8E9EC00D8E9
@@ -243,7 +243,7 @@ object zauthlookupform: Tzauthlookupform
       EC00}
     NumGlyphs = 2
   end
-  object BitBtn2: TTntBitBtn
+  object clearbutton: TTntBitBtn
     Left = 291
     Top = 32
     Width = 185
@@ -256,7 +256,7 @@ object zauthlookupform: Tzauthlookupform
     Font.Style = []
     ParentFont = False
     TabOrder = 5
-    OnClick = BitBtn2Click
+    OnClick = clearbuttonClick
     Glyph.Data = {
       7E0B0000424D7E0B000000000000360000002800000026000000130000000100
       200000000000480B0000120B0000120B00000000000000000000D8E9EC00D8E9
@@ -362,24 +362,13 @@ object zauthlookupform: Tzauthlookupform
     ItemHeight = 14
     TabOrder = 6
   end
-  object ListBox3: TTntListBox
-    Left = 680
-    Top = 4
-    Width = 25
-    Height = 21
-    ItemHeight = 14
-    MultiSelect = True
-    TabOrder = 7
-    Visible = False
-    OnClick = ListBox3Click
-  end
   object truncationcheckbox1: TTntCheckBox
     Left = 584
     Top = 8
     Width = 89
     Height = 17
     Caption = 'Truncation'
-    TabOrder = 8
+    TabOrder = 7
   end
   object term1: TTntEdit
     Left = 216
@@ -392,7 +381,7 @@ object zauthlookupform: Tzauthlookupform
     Font.Name = 'Arial'
     Font.Style = []
     ParentFont = False
-    TabOrder = 9
+    TabOrder = 8
   end
   object nextrecs: TTntBitBtn
     Left = 664
@@ -400,13 +389,15 @@ object zauthlookupform: Tzauthlookupform
     Width = 41
     Height = 25
     Hint = 'Next MARC'
+    Anchors = [akTop, akRight]
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
     Font.Name = 'Arial'
     Font.Style = []
     ParentFont = False
-    TabOrder = 10
+    TabOrder = 9
+    OnClick = nextrecsClick
     Glyph.Data = {
       7E0B0000424D7E0B000000000000360000002800000026000000130000000100
       200000000000480B0000120B0000120B00000000000000000000DAF0F500DAF0
@@ -516,7 +507,8 @@ object zauthlookupform: Tzauthlookupform
     Font.Name = 'Arial'
     Font.Style = []
     ParentFont = False
-    TabOrder = 11
+    TabOrder = 10
+    OnClick = prevrecsClick
     Glyph.Data = {
       7E0B0000424D7E0B000000000000360000002800000026000000130000000100
       200000000000480B0000120B0000120B00000000000000000000DAF0F500DAF0
@@ -613,15 +605,17 @@ object zauthlookupform: Tzauthlookupform
       F500}
     NumGlyphs = 2
   end
-  object BitBtn1: TTntBitBtn
-    Left = 512
-    Top = 744
+  object useheadingbutton: TTntBitBtn
+    Left = 496
+    Top = 742
     Width = 113
     Height = 25
+    Anchors = [akRight, akBottom]
     Caption = 'Use Heading'
     Default = True
     ModalResult = 1
-    TabOrder = 12
+    TabOrder = 11
+    OnClick = useheadingbuttonClick
     Glyph.Data = {
       7E0B0000424D7E0B000000000000360000002800000026000000130000000100
       200000000000480B0000120B0000120B00000000000000000000D8E9EC00D8E9
@@ -718,15 +712,17 @@ object zauthlookupform: Tzauthlookupform
       EC00}
     NumGlyphs = 2
   end
-  object TntBitBtn1: TTntBitBtn
+  object cancelbutton: TTntBitBtn
     Left = 632
-    Top = 744
+    Top = 742
     Width = 75
     Height = 25
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 13
+    TabOrder = 12
+    OnClick = cancelbuttonClick
     Glyph.Data = {
       7E0B0000424D7E0B000000000000360000002800000026000000130000000100
       200000000000480B0000120B0000120B00000000000000000000D8E9EC00D8E9
