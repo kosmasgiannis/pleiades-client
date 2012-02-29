@@ -104,7 +104,7 @@ begin
  zoom_authhosts[1].format:='Usmarc';
  zoom_authhosts[1].scharset:=UpperCase(FastRecordCreator.myzcharset);
  zoom_authhosts[1].dcharset:=UpperCase(FastRecordCreator.myzcharset);
- zoom_authhosts[1].profile:=FastRecordCreator.myzauthprofile;
+ zoom_authhosts[1].profile:=FastRecordCreator.myzauthprofile+'commands';
  zoom_authhosts[1].mark:=0;
  zoom_authhosts[1].hits:=0;
  label8.Caption:='';
