@@ -52,13 +52,6 @@ object zauthlookupform: Tzauthlookupform
   end
   object Label12: TTntLabel
     Left = 8
-    Top = 48
-    Width = 6
-    Height = 14
-    Caption = '[]'
-  end
-  object Label11: TTntLabel
-    Left = 8
     Top = 64
     Width = 6
     Height = 14

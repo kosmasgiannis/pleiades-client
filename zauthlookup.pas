@@ -16,7 +16,6 @@ type
     truncationcheckbox1: TTntCheckBox;
     Label8: TTntLabel;
     newresults: TTntStringGrid;
-    Label11: TTntLabel;
     Label12: TTntLabel;
     fieldscombobox1: TTntComboBox;
     full: TTntMemo;
@@ -32,8 +31,6 @@ type
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure TreeView1MouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
     procedure newresultsClick(Sender: TObject);
     procedure lookupbuttonClick(Sender: TObject);
     procedure clearbuttonClick(Sender: TObject);
@@ -66,7 +63,7 @@ var
   zauthlookupform: Tzauthlookupform;
 
 const MAXSEARCHFIELDS = 1;
-
+      RECORDS_PER_PAGE = 3;
 implementation
 
 uses MainUnit, GlobalProcedures;
@@ -87,7 +84,6 @@ var
   langcode, path, myinifname2, hlp : string;
   myIniFile2 : TIniFile;
 begin
- label11.Caption := '';
  label12.Caption := '';
  tag := '100';
  heading := 'Kosmas';
@@ -211,7 +207,8 @@ begin
   newresults.RowCount:=(recordset.Count div 3)+1;
   for i:=0 to ((recordset.Count div 3)-1) do
   begin
-   newresults.Cells[0,i+1]:=inttostr(i+1);
+   newresults.Cells[0,i+1] := inttostr(zoom_authhosts[1].mark-(recordset.Count div 3)+i+1);
+
 //   errors.Lines.Add(utf8decode(recordset[(i*3)+2]));
    get_main_heading(recordset[(i*3)+2],tag,heading);
    newresults.Cells[1,i+1]:=tag;
@@ -221,94 +218,10 @@ begin
  end;
 end;
 
-procedure Tzauthlookupform.TreeView1MouseDown(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var
-  HT : THitTests;
-  node : PZOOM_HOST;
-  rc : integer;
-begin
-if (Sender is TTntTreeView) then
-  begin
-  with Sender as TTntTreeView do
-    begin
-     HT := GetHitTestInfoAt(X,Y);
-     if (htOnItem in HT) then
-     begin
-      node := PZOOM_HOST(GetNodeAt(X,Y).Data);
-      label11.Caption:=node^.name+' ('+node^.format+') ';
-      label12.Caption:='';
-      full.Clear;
-      if node^.errorcode = 0 then
-      begin
-       if node^.hits <> 0 then
-       begin
-        rc := 0;
-        if (node^.mark<node^.hits) then
-        begin
-         label12.Caption:='Please wait...';
-         application.processmessages;
-         rc := zpresent(node^,15,node^.Records,'F');
-         if rc < 0 then
-         begin
-           if rc = -1 then
-            errors.Lines.Add('Out of memory')
-           else if rc = -2 then
-           begin
-            errors.Lines.Add('Connection to host '+node^.name+' lost. Resuming...');
-            if zresume_search(node^) <> -1 then
-            begin
-              rc := zpresent(node^,15,node^.Records,'F');
-            end
-            else
-              errors.Lines.Add('Error connecting to '+node^.name+'.');
-           end;
-         end;
-        end;
-        if rc >= 0 then
-        begin
-          show_records;
-          if (node^.current_row = -1) then
-            node^.current_row:=1;
-          newresults.Row:=node^.current_row;
-          full.lines.Clear;
-          marcrecord2memo(node^.Records[((newresults.Row-1)*3)+2], full);
-          full.SelStart:=0;
-          full.SelLength:=0;
-
-          label12.Caption:='Showing 1-'+inttostr(node^.mark)+' of '+inttostr(node^.hits);
-         end
-         else
-           errors.Lines.Add('Error retrieving records from '+node^.name+'.');
-       end
-       else
-       begin
-        newresults.RowCount := 2;
-        newresults.Cells[0,1]:='';
-        newresults.Cells[1,1]:='';
-        newresults.Cells[2,1]:='';
-        label12.Caption:='No results.';
-       end;
-      end
-      else
-      begin
-       newresults.RowCount := 2;
-       newresults.Cells[0,1]:='';
-       newresults.Cells[1,1]:='';
-       newresults.Cells[2,1]:='';
-       label12.Caption:=node^.errorstring;
-      end;
-     end;
-    end;
-  end;
-
-end;
-
 procedure Tzauthlookupform.getrecords;
 var
   rc : integer;
 begin
-  label11.Caption:=zoom_authhosts[1].name+' ('+zoom_authhosts[1].format+') ';
   label12.Caption:='';
   full.Clear;
   if zoom_authhosts[1].errorcode = 0 then
@@ -320,7 +233,7 @@ begin
     begin
      label12.Caption:='Please wait...';
      application.processmessages;
-     rc := zpresent(zoom_authhosts[1],15,recordset,'F');
+     rc := zpresent(zoom_authhosts[1], RECORDS_PER_PAGE, recordset,'F');
      if rc < 0 then
      begin
        if rc = -1 then
@@ -330,7 +243,7 @@ begin
         errors.Lines.Add('Connection to host '+zoom_authhosts[1].name+' lost. Resuming...');
         if zresume_search(zoom_authhosts[1]) <> -1 then
         begin
-          rc := zpresent(zoom_authhosts[1],15,recordset,'F');
+          rc := zpresent(zoom_authhosts[1], RECORDS_PER_PAGE, recordset,'F');
         end
         else
           errors.Lines.Add('Error connecting to '+zoom_authhosts[1].name+'.');
@@ -347,7 +260,8 @@ begin
       marcrecord2memo(recordset[((newresults.Row-1)*3)+2], full);
       full.SelStart:=0;
       full.SelLength:=0;
-      label12.Caption:='Showing 1-'+inttostr(zoom_authhosts[1].mark)+' of '+inttostr(zoom_authhosts[1].hits);
+      label12.Caption := 'Showing '+inttostr(zoom_authhosts[1].mark-(recordset.Count div 3)+1)+'-'+inttostr(zoom_authhosts[1].mark);
+      label12.Caption := label12.Caption+' of '+inttostr(zoom_authhosts[1].hits);
     end
     else
       errors.Lines.Add('Error retrieving records from '+zoom_authhosts[1].name+'.');
@@ -434,7 +348,6 @@ var
   myinifname2, path : string;
   myinifile2 : TIniFile;
 begin
- label11.Caption:='';
  label12.Caption:='';
  full.Clear;
 
@@ -478,7 +391,6 @@ begin
     ReadSectionValues(zoom_authhosts[1].profile,cmds);
    end;
    myinifile2.free;
-   errors.Lines.Add('Start');
    querystring := '';
    error:='';
    s1:='';
@@ -553,6 +465,7 @@ begin
      begin
       errors.Lines.Add(zoom_authhosts[1].errorstring);
      end;
+     getrecords;
     end;
    end;
 
@@ -585,22 +498,38 @@ end;
 
 procedure Tzauthlookupform.nextrecsClick(Sender: TObject);
 begin
-//
+  if (zoom_authhosts[1].mark < zoom_authhosts[1].hits) then
+  begin
+    recordset.Clear;
+    getrecords;
+  end;
 end;
 
 procedure Tzauthlookupform.prevrecsClick(Sender: TObject);
+var rem : integer;
 begin
-//
+  rem := zoom_authhosts[1].mark mod RECORDS_PER_PAGE;
+  if rem = 0 then rem := RECORDS_PER_PAGE;
+  zoom_authhosts[1].mark := zoom_authhosts[1].mark - RECORDS_PER_PAGE - rem;
+  if (zoom_authhosts[1].mark < 0) then zoom_authhosts[1].mark := 0;
+  recordset.Clear;
+  getrecords;
 end;
 
 procedure Tzauthlookupform.useheadingbuttonClick(Sender: TObject);
+var tag, ind, heading : WideString;
 begin
-//
+  if (full.Lines.Count > 0) then
+  begin
+    get_main_heading_from_memo(full, tag, ind, heading);
+    showmessage(tag+' '+ind+' '+heading);
+  end;
 end;
 
 procedure Tzauthlookupform.cancelbuttonClick(Sender: TObject);
 begin
 // zcmdkeys.Free;
+ close;
 end;
 
 end.
