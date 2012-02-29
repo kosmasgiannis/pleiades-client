@@ -119,6 +119,7 @@ procedure append_fields(source,stag:WideString; var dir: UTF8String; var dirpos 
 function extract_field(s : WideString; f: WideString; which : integer; keepsfd : boolean) : WideString;
 procedure get_author_title(rec: UTF8String; format : string; var author, title:WideString; adddate : boolean);
 procedure get_main_heading(rec: UTF8String; var tag, heading:WideString);
+procedure get_main_heading_from_memo(fullrec : TTntMemo; var tag, ind, heading : WideString);
 procedure get_controlfieldtext(rec : UTF8String; tag,posit : string; var text:WideString);
 procedure get_fieldtext(rec : UTF8String; tag,subfields : string; var text : WideString; which: integer = 0);
 function get_lang(rec,format : string):string;
@@ -2057,6 +2058,28 @@ begin
   end;
  end;
  heading := extract_field(heading,fields,0,false);
+end;
+
+procedure get_main_heading_from_memo(fullrec : TTntMemo; var tag, ind, heading : WideString);
+var p : integer;
+    htag : WideString;
+begin
+ tag := '';
+ ind := '';
+ heading := '';
+ for p:=0 to fullrec.Lines.Count-1 do
+ begin
+  htag := copy(fullrec.Lines[p],2,3);
+  if (copy(htag,1,1) <> '1') then
+   continue
+  else
+  begin
+    tag := htag;
+    ind := copy(fullrec.Lines[p],7,2);
+    heading := copy(fullrec.Lines[p],9,length(fullrec.Lines[p]));
+    break;
+  end;
+ end;
 end;
 
 function merge_mrcs(source, retrieved : WideString): WideString;
