@@ -154,7 +154,7 @@ begin
  author := remove_punctuation(author);
  title := remove_punctuation(title);
  for p:=1 to MAXHOSTS do
-  Zoom_Hosts[1].active:=false;
+  Zoom_Hosts[p].active:=false;
 
  current_format:='USmarc';
  Button7.Visible:=false;
