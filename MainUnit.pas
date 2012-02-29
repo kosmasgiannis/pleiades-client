@@ -480,7 +480,7 @@ begin
 
    myzcharset := ReadString(currentdatabase,'myzcharset', 'UTF8');
    myzprofile := ReadString(currentdatabase,'myzprofile', 'myzeb');
-   myzauthprofile := ReadString(currentdatabase,'myzauthprofile', 'myzebauthcommands');
+   myzauthprofile := ReadString(currentdatabase,'myzauthprofile', 'myzebauth');
    myzproxy := ReadString(currentdatabase,'myzproxy', '');
 
   end;
