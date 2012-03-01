@@ -128,6 +128,9 @@ function trimlead(s:WideString) : WideString;
 procedure filter_marc_memo(fullrec : TTntMemo);
 function ReverseStringWide(const AText: WideString): WideString;
 
+function extract_fields(s : string; f: string; delim : char) : string; overload;
+function extract_fields(s : string; f: string) : string; overload;
+
 function makemrcfromnew : UTF8String;
 function makenewauthmrc : UTF8String;
 procedure adddirentry(var dir : UTF8String; tag : string; len, pos : integer);
@@ -1894,6 +1897,11 @@ begin
 end;
 
 function extract_fields(s : string; f: string) : string;
+begin
+  result:=extract_fields(s, f, #31);
+end;
+
+function extract_fields(s : string; f: string; delim : char) : string;
 var i:integer;
  cf : char;
  flag : boolean;
@@ -1904,7 +1912,7 @@ begin
  i:=1;
  while i <= length(s) do
  begin
-  if s[i] = #31 then
+  if s[i] = delim then
   begin
    i:=i+1;
    cf := s[i];
