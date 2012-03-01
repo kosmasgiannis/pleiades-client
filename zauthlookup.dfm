@@ -1,7 +1,7 @@
 object zauthlookupform: Tzauthlookupform
   Left = 227
   Top = 62
-  Width = 737
+  Width = 753
   Height = 804
   Caption = 'Lookup MARC Authorities'
   Color = clBtnFace
@@ -21,23 +21,10 @@ object zauthlookupform: Tzauthlookupform
   OnPaint = TntFormPaint
   OnResize = TntFormResize
   DesignSize = (
-    729
+    745
     770)
   PixelsPerInch = 96
   TextHeight = 14
-  object Label4: TTntLabel
-    Left = 9
-    Top = 456
-    Width = 59
-    Height = 14
-    Caption = 'Full record'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Arial'
-    Font.Style = [fsBold]
-    ParentFont = False
-  end
   object Label8: TTntLabel
     Left = 8
     Top = 32
@@ -59,9 +46,10 @@ object zauthlookupform: Tzauthlookupform
   end
   object full: TTntMemo
     Left = 8
-    Top = 472
-    Width = 697
+    Top = 368
+    Width = 713
     Height = 265
+    TabStop = False
     Anchors = [akLeft, akTop, akRight, akBottom]
     Font.Charset = GREEK_CHARSET
     Font.Color = clWindowText
@@ -82,16 +70,16 @@ object zauthlookupform: Tzauthlookupform
     Height = 21
     ItemHeight = 14
     MultiSelect = True
-    TabOrder = 1
+    TabOrder = 8
     Visible = False
   end
   object errors: TTntMemo
     Left = 8
-    Top = 368
-    Width = 697
+    Top = 688
+    Width = 713
     Height = 81
     TabStop = False
-    Anchors = [akLeft, akTop, akRight]
+    Anchors = [akLeft, akRight, akBottom]
     Font.Charset = GREEK_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -100,12 +88,12 @@ object zauthlookupform: Tzauthlookupform
     ParentFont = False
     ReadOnly = True
     ScrollBars = ssBoth
-    TabOrder = 2
+    TabOrder = 9
   end
   object newresults: TTntStringGrid
     Left = 8
     Top = 120
-    Width = 697
+    Width = 713
     Height = 245
     Anchors = [akLeft, akTop, akRight]
     ColCount = 3
@@ -119,12 +107,12 @@ object zauthlookupform: Tzauthlookupform
     Font.Style = []
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSelect]
     ParentFont = False
-    TabOrder = 3
+    TabOrder = 10
     OnClick = newresultsClick
     ColWidths = (
       44
       63
-      583)
+      599)
   end
   object lookupbutton: TTntBitBtn
     Left = 491
@@ -353,7 +341,7 @@ object zauthlookupform: Tzauthlookupform
     Height = 22
     Style = csDropDownList
     ItemHeight = 14
-    TabOrder = 6
+    TabOrder = 1
   end
   object truncationcheckbox1: TTntCheckBox
     Left = 584
@@ -361,7 +349,7 @@ object zauthlookupform: Tzauthlookupform
     Width = 89
     Height = 17
     Caption = 'Truncation'
-    TabOrder = 7
+    TabOrder = 3
   end
   object term1: TTntEdit
     Left = 216
@@ -374,10 +362,10 @@ object zauthlookupform: Tzauthlookupform
     Font.Name = 'Arial'
     Font.Style = []
     ParentFont = False
-    TabOrder = 8
+    TabOrder = 2
   end
   object nextrecs: TTntBitBtn
-    Left = 664
+    Left = 680
     Top = 88
     Width = 41
     Height = 25
@@ -389,7 +377,8 @@ object zauthlookupform: Tzauthlookupform
     Font.Name = 'Arial'
     Font.Style = []
     ParentFont = False
-    TabOrder = 9
+    TabOrder = 11
+    TabStop = False
     OnClick = nextrecsClick
     Glyph.Data = {
       7E0B0000424D7E0B000000000000360000002800000026000000130000000100
@@ -500,7 +489,8 @@ object zauthlookupform: Tzauthlookupform
     Font.Name = 'Arial'
     Font.Style = []
     ParentFont = False
-    TabOrder = 10
+    TabOrder = 12
+    TabStop = False
     OnClick = prevrecsClick
     Glyph.Data = {
       7E0B0000424D7E0B000000000000360000002800000026000000130000000100
@@ -599,15 +589,15 @@ object zauthlookupform: Tzauthlookupform
     NumGlyphs = 2
   end
   object useheadingbutton: TTntBitBtn
-    Left = 496
-    Top = 742
+    Left = 512
+    Top = 646
     Width = 113
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'Use Heading'
     Default = True
     ModalResult = 1
-    TabOrder = 11
+    TabOrder = 6
     OnClick = useheadingbuttonClick
     Glyph.Data = {
       7E0B0000424D7E0B000000000000360000002800000026000000130000000100
@@ -706,15 +696,15 @@ object zauthlookupform: Tzauthlookupform
     NumGlyphs = 2
   end
   object cancelbutton: TTntBitBtn
-    Left = 632
-    Top = 742
+    Left = 648
+    Top = 646
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 12
+    TabOrder = 7
     OnClick = cancelbuttonClick
     Glyph.Data = {
       7E0B0000424D7E0B000000000000360000002800000026000000130000000100

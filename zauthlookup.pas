@@ -19,7 +19,6 @@ type
     Label12: TTntLabel;
     fieldscombobox1: TTntComboBox;
     full: TTntMemo;
-    Label4: TTntLabel;
     ImageList1: TImageList;
     clearbutton: TTntBitBtn;
     lookupbutton: TTntBitBtn;
