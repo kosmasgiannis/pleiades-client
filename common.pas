@@ -2463,7 +2463,7 @@ begin
  tcnt:=26; // leader + record terminator + directory delimiter.
  for i:=1 to lines.Count-1 do
  begin
-  if ((lines[i][1] = '[') and (lines[i][5]=']')) then
+  if ((length(lines[i]) > 0 ) and (lines[i][1] = '[') and (lines[i][5]=']')) then
   begin
    if(tag <> '')then //and b
    begin
