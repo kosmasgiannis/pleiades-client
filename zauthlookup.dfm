@@ -120,6 +120,7 @@ object zauthlookupform: Tzauthlookupform
     Width = 185
     Height = 25
     Caption = 'Lookup'
+    Default = True
     Font.Charset = GREEK_CHARSET
     Font.Color = clWindowText
     Font.Height = -10
@@ -595,7 +596,6 @@ object zauthlookupform: Tzauthlookupform
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'Use Heading'
-    Default = True
     ModalResult = 1
     TabOrder = 6
     OnClick = useheadingbuttonClick

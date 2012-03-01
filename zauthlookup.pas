@@ -45,11 +45,12 @@ type
   public
     { Public declarations }
     //globalproxy,
-    tag, heading: WideString;
-    source_record : UTF8String;
-    myrecno : integer;
-    calledfrom : string;
-    totalrecords, displayedrecords:integer;
+    tag, heading,
+    result_heading,
+    result_ind      : WideString;
+
+    totalrecords:integer;
+    tagmappings,
     cmdnames, // Commands as displayed in comboboxes.
     cmds,     // RPN commands attributes.
     ops,      // boolean operands names.
@@ -62,7 +63,7 @@ var
   zauthlookupform: Tzauthlookupform;
 
 const MAXSEARCHFIELDS = 1;
-      RECORDS_PER_PAGE = 3;
+      RECORDS_PER_PAGE = 15;
 implementation
 
 uses MainUnit, GlobalProcedures;
@@ -79,13 +80,14 @@ end;
 
 procedure Tzauthlookupform.FormActivate(Sender: TObject);
 var
-  p : integer;
+  p, i : integer;
   langcode, path, myinifname2, hlp : string;
   myIniFile2 : TIniFile;
 begin
  label12.Caption := '';
- tag := '100';
- heading := 'Kosmas';
+ result_ind := '';
+ result_heading := '';
+ heading := extract_fields(heading, 'abcdefghijklmnopqrstuvwxyz0123456789', '$');
  heading := remove_punctuation(heading);
 
  zoom_authhosts[1].name:='MyZebraAuthDatabase';
@@ -120,6 +122,8 @@ begin
  cmdnames.Clear;
  ops:=Tstringlist.Create;
  ops.Clear;
+ tagmappings:=Tstringlist.Create;
+ tagmappings.Clear;
 
  langcode:='en';
  MyIniFile2 := TIniFile.Create(myinifname2);
@@ -136,6 +140,14 @@ begin
   ops.Add(hlp);
   hlp:=ReadString('Zops.'+langcode,'@not','And Not');
   ops.Add(hlp);
+
+  ReadSectionValues('tag2myzebauthcommand',tagmappings);
+  i:=tagmappings.IndexOfName(tag);
+  if (i <> -1) then
+  begin
+    i:= zcmdkeys.IndexOfName(tagmappings.ValueFromIndex[i]);
+  end;
+
  end;
 
  for p:=1 to MAXSEARCHFIELDS do
@@ -148,6 +160,7 @@ begin
     items.Assign(cmdnames);
     if cmdnames.Count > p-1 then itemindex:=p-1
     else itemindex:=0;
+    if i <> -1 then itemindex:=i;
    end;
   end;
   if FindComponent('opscombobox'+IntToStr(p)) <> nil then
@@ -516,12 +529,13 @@ begin
 end;
 
 procedure Tzauthlookupform.useheadingbuttonClick(Sender: TObject);
-var tag, ind, heading : WideString;
+var authtag, authind, authheading : WideString;
 begin
   if (full.Lines.Count > 0) then
   begin
-    get_main_heading_from_memo(full, tag, ind, heading);
-    showmessage(tag+' '+ind+' '+heading);
+    get_main_heading_from_memo(full, authtag, authind, authheading);
+    result_ind := authind;
+    result_heading := authheading;
   end;
 end;
 
