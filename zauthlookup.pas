@@ -26,6 +26,7 @@ type
     prevrecs: TTntBitBtn;
     useheadingbutton: TTntBitBtn;
     cancelbutton: TTntBitBtn;
+    New: TTntBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure FormActivate(Sender: TObject);
@@ -40,6 +41,7 @@ type
     procedure useheadingbuttonClick(Sender: TObject);
     procedure cancelbuttonClick(Sender: TObject);
     procedure getrecords;
+    procedure NewClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -66,7 +68,8 @@ const MAXSEARCHFIELDS = 1;
       RECORDS_PER_PAGE = 15;
 implementation
 
-uses MainUnit, GlobalProcedures;
+uses MainUnit, GlobalProcedures,
+  MARCAuthEditor;
 
 {$R *.dfm}
 
@@ -545,6 +548,28 @@ procedure Tzauthlookupform.cancelbuttonClick(Sender: TObject);
 begin
 // zcmdkeys.Free;
  close;
+end;
+
+procedure Tzauthlookupform.NewClick(Sender: TObject);
+var temp : UTF8string;
+begin
+  NewMARCRecord('auth');
+  FastRecordCreator.gotoauthrecno := data.auth.FieldByName('recno').AsInteger;
+  MARCAuthEditorForm.record_index := -1;
+  MARCAuthEditorForm.edit_from_result_set := false;
+  with data.auth do
+  begin
+    EditTable(data.auth);
+    temp := makenewauthmrc;
+    if length(temp) >= 10 then temp[10] := 'a';
+    EnhanceMARC(FastRecordCreator.gotoauthrecno, temp);
+    GetBlob('text').IsUnicode := True;
+    GetBlob('text').AsWideString := StringToWideString(temp, Greek_codepage);
+    TBlobField(FieldByName('text')).Modified := True;
+    PostTable(data.auth);
+    RecordUpdated(myzebraauthhost, 'insert', FastRecordCreator.gotoauthrecno, temp);
+  end;
+  MARCAuthEditorForm.ShowModal;
 end;
 
 end.
