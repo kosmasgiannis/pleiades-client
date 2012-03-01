@@ -1,6 +1,6 @@
 object MARCEditorform: TMARCEditorform
-  Left = 282
-  Top = 241
+  Left = 277
+  Top = 118
   Width = 783
   Height = 711
   Caption = 'Marc Editor'
@@ -1205,6 +1205,11 @@ object MARCEditorform: TMARCEditorform
     object Edittag1: TTntMenuItem
       Caption = 'Edit Field'
       OnClick = fullDblClick
+    end
+    object AuthorityLookup1: TTntMenuItem
+      Caption = 'Authority Lookup'
+      ShortCut = 116
+      OnClick = AuthorityLookup1Click
     end
     object N3: TTntMenuItem
       Caption = '-'

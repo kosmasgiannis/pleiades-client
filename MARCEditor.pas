@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, StdCtrls, common, mycharconversion, TntStdCtrls, ComCtrls,
-  Mask, DBCtrls, TntDBCtrls, dbcgrids, ExtCtrls, Grids, DBGrids, DateUtils,
+  Mask, IniFiles, DBCtrls, TntDBCtrls, dbcgrids, ExtCtrls, Grids, DBGrids, DateUtils,
   TntDBGrids, TntClasses, DB, TntComCtrls, Buttons, TntButtons, TntDialogs,
   TntMenus, TntForms, ActnList, cUnicodeCodecs;
 
@@ -76,6 +76,7 @@ type
     prevrec: TTntBitBtn;
     nextrec: TTntBitBtn;
     TntBitBtn4: TTntBitBtn;
+    AuthorityLookup1: TTntMenuItem;
     procedure Return1Click(Sender: TObject);
     procedure Save1Click(Sender: TObject);
     procedure Delete1Click(Sender: TObject);
@@ -116,6 +117,7 @@ type
     procedure prevrecClick(Sender: TObject);
     procedure nextrecClick(Sender: TObject);
     procedure TntBitBtn4Click(Sender: TObject);
+    procedure AuthorityLookup1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -144,7 +146,8 @@ implementation
 uses zoomit, form008, MyAccess, ldr, MainUnit, DataUnit,  Math, EditMarcUnit,
   StrUtils, WideIniClass, ProgresBarUnit, utility,
   GlobalProcedures, HoldingsUnit, ShowHoldMemoUnit, DigitalUnit, zlocate,
-  HoldingsRangeUnit;
+  HoldingsRangeUnit,
+  zauthlookup;
 
 {$R *.dfm}
 
@@ -1362,6 +1365,53 @@ begin
   end;
   HoldingsRange.ShowModal;
   SetHoldInRichEdit(TntRichEditME);
+ end;
+end;
+
+procedure TMARCEditorform.AuthorityLookup1Click(Sender: TObject);
+var tag, myinifname2,path,inds : string;
+tagmappings : Tstrings;
+  myIniFile2 : TIniFile;
+  i: integer;
+  line : WideString;
+begin
+ tag := LeftStr(full.Lines.Strings[linenr], 5);
+ if tag='' then exit;
+ tag := copy(tag,2,3);
+ tagmappings:=Tstringlist.Create;
+ tagmappings.Clear;
+ path:=extractfilepath(paramstr(0));
+ myinifname2 := path+'zparams.ini';
+ MyIniFile2 := TIniFile.Create(myinifname2);
+ with MyIniFile2 do
+ begin
+   ReadSectionValues('tag2myzebauthcommand',tagmappings);
+   i :=tagmappings.IndexOfName(tag);
+ end;
+ tagmappings.Clear;
+ tagmappings.Free;
+
+ if (i <> -1) then
+ begin
+   if length(full.Lines.Strings[linenr])>6 then
+   begin
+     zauthlookupform.tag := tag;
+     zauthlookupform.heading := copy(full.Lines.Strings[linenr], 9, length(full.Lines.Strings[linenr]));
+     inds := copy(full.Lines.Strings[linenr], 7, 2);
+     zauthlookupform.ShowModal;
+
+     if zauthlookupform.ModalResult = mrOk then
+     begin
+        if (zauthlookupform.result_heading <> '') then
+        begin
+          inds := copy(zauthlookupform.result_ind, 1, 1)+copy(inds, 2, 1);
+          line := '['+tag+'] '+inds+zauthlookupform.result_heading;
+          full.Lines.Delete(linenr);
+          full.Lines.Insert(linenr, line);
+        end;
+     end;
+   end;
+
  end;
 end;
 
