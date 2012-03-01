@@ -12,6 +12,7 @@ object MARCEditorform: TMARCEditorform
   Font.Height = -11
   Font.Name = 'Arial'
   Font.Style = []
+  KeyPreview = True
   Menu = MainMenu1
   OldCreateOrder = False
   Position = poMainFormCenter

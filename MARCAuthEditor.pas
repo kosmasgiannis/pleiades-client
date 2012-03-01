@@ -530,8 +530,13 @@ end;
 procedure TMARCAuthEditorform.fullKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
+ if (full.ReadOnly = False) then
+ begin
   if (Shift = [ssCtrl]) and (Key = 84) Then   //Key = t
-      Arrangetags1Click(Sender);
+      Arrangetags1Click(Sender)
+  else if (Key = VK_F10) then
+    Locate1Click(Sender);
+ end;
 end;
 
 procedure TMARCAuthEditorform.TntFormShow(Sender: TObject);
