@@ -192,6 +192,8 @@ begin
 
  keys.Clear;
  keys.Free;
+ tagmappings.Clear;
+ tagmappings.Free;
 
  MyIniFile2.Free;
  errors.Lines.Clear;
