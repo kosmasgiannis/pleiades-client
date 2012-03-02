@@ -520,10 +520,10 @@ object FastRecordCreator: TFastRecordCreator
           FixedColor = clMedGray
           RowCount = 26
           Font.Charset = GREEK_CHARSET
-          Font.Color = clActiveCaption
+          Font.Color = clDefault
           Font.Height = 14
           Font.Name = 'Arial'
-          Font.Style = []
+          Font.Style = [fsBold]
           Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
           ParentFont = False
           PopupMenu = PopupMenu1
@@ -2044,7 +2044,7 @@ object FastRecordCreator: TFastRecordCreator
         Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = [fsBold]
-        ItemHeight = 0
+        ItemHeight = 13
         ParentFont = False
         TabOrder = 1
       end
