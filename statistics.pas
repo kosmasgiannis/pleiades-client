@@ -31,7 +31,7 @@ type
   stat_rec = record
       usercode : integer;
       username : widestring;
-      scb, sci, smb, smi: integer;
+      scb, sci, smb, smi, sca, sma: integer;
   end;
 
 var
@@ -64,6 +64,8 @@ begin
       user_stat[b].sci:=0;
       user_stat[b].smb:=0;
       user_stat[b].smi:=0;
+      user_stat[b].sca:=0;
+      user_stat[b].sma:=0;
       Next;
     end;
   end;
@@ -81,12 +83,14 @@ begin
       if (cmtype = 'c') then
       begin
         if key = 'bib' then user_stat[i].scb:=value
-        else if key = 'item' then user_stat[i].sci := value;
+        else if key = 'item' then user_stat[i].sci := value
+        else if key = 'auth' then user_stat[i].sca := value;
       end
       else
       begin
         if key = 'bib' then user_stat[i].smb:=value
-        else if key = 'item' then user_stat[i].smi := value;
+        else if key = 'item' then user_stat[i].smi := value
+        else if key = 'auth' then user_stat[i].sma := value;
       end;
       break;
     end;
@@ -94,20 +98,20 @@ begin
 end;
 
 function TstatisticsForm.makequery(tab, cmtype:string; which : integer):string;
-var  s, dd: string;
+var  s2, s, dd, dd2: string;
      todadat : TDate;
      TempDateFormat : string;
 begin
   result := '';
-  if tab = 'basket' then
+  if ((tab = 'basket') or (tab = 'auth')) then
   begin
-    if cmtype = 'c' then dd := 'created'
-    else dd := 'modified';
+    if ((cmtype = 'c') or (cmtype = ' ')) then begin dd := 'created'; dd2 :='modified'; end
+    else if ((cmtype = 'm')) then begin dd := 'modified'; dd2:='created'; end;
   end
   else
   begin
-    if cmtype = 'c' then dd := 'datecreated'
-    else dd := 'datemodified';
+    if ((cmtype = 'c') or (cmtype = ' ')) then begin dd := 'datecreated'; dd2:= 'datemodified'; end
+    else if ((cmtype = 'm')) then begin dd := 'datemodified'; dd2:='datecreated'; end;
   end;
   TempDateFormat := ShortDateFormat;
   ShortDateFormat := 'yyyy-mm-dd';
@@ -115,36 +119,53 @@ begin
   begin
     s := ' WHERE users.usercode='+tab;
     if cmtype = 'c' then s:= s+'.creator '
-    else s:=s+'.modifier';
+    else if cmtype = 'm' then s:=s+'.modifier'
+    else s:=s+'.creator or users.usercode='+tab+'.modifier';
   end
   else
     s := ' WHERE 1=1';
-
+  s2 := '';
   if DateTimePicker1.Checked Then
   begin
     todadat := DateTimePicker1.Date;
-    s:= s + ' and ('+dd+' >= "'+DateToStr(todadat)+'")';
+    if ((cmtype = 'c') or (cmtype = 'm')) then
+      s:= s + ' and ('+dd+' >= "'+DateToStr(todadat)+'")'
+    else
+    begin
+      s:= s + ' and ('+dd+' >= "'+DateToStr(todadat)+'")';
+      s2:= s2 + '('+dd2+' >= "'+DateToStr(todadat)+'")';
+    end;
   end;
 
   if DateTimePicker2.Checked Then
   begin
     todadat := DateTimePicker2.Date;
-    s:= s + ' and ('+dd+' <= "'+DateToStr(todadat)+'")';
+    if ((cmtype = 'c') or (cmtype = 'm')) then
+      s:= s + ' and ('+dd+' <= "'+DateToStr(todadat)+'")'
+    else
+    begin
+      s:= s + ' and ('+dd+' <= "'+DateToStr(todadat)+'")';
+      if (s2 <> '') then s2 := s2+' and ';
+      s2:= s2 + '('+dd2+' <= "'+DateToStr(todadat)+'")';
+    end;
   end;
-
+  if (s2 <> '') then s:= s+' or ('+s2+')';
   if which = 1 then
   begin
     if cmtype = 'c' then
       result := 'SELECT count('+tab+'.recno), users.usercode, concat(users.userfirstname," ", users.userlastname) FROM users, '+tab+' ' + s+' Group by '+tab+'.creator'
-    else
+    else if cmtype ='m' then
       result := 'SELECT count('+tab+'.recno), users.usercode, concat(users.userfirstname," ", users.userlastname) FROM users, '+tab+' ' + s+' Group by '+tab+'.modifier'
+    else
+      result := 'SELECT count('+tab+'.recno), users.usercode, concat(users.userfirstname," ", users.userlastname) FROM users, '+tab+' '+s
   end
   else
-    result := 'SELECT count(distinct '+dd+') FROM '+tab+' ' + s;
+    result := 'SELECT count(distinct '+dd2+') FROM '+tab+' ' + s;
+  //showmessage(result);
 end;
 
 procedure TstatisticsForm.BitBtn1Click(Sender: TObject);
-var  nod, scb,sci, smb, smi, b, e : integer;
+var  nod, noda, sca, sma, scb,sci, smb, smi, b, e : integer;
 x : TRect;
 begin
   Clear_String_Grid(stat_results);
@@ -153,12 +174,15 @@ begin
   sci:=0;
   smb:=0;
   smi:=0;
+  sca:=0;
+  sma:=0;
   nod := 0;
+  noda := 0;
   with data.query1 do
   begin
     Close;
     SQL.Clear;
-    SQL.Add(makequery('basket','c',2));
+    SQL.Add(makequery('basket',' ',2));
     Execute;
     First;
     while not Eof do
@@ -166,10 +190,18 @@ begin
       nod:=Fields[0].asinteger;
       Next;
     end;
-  end;
 
-  with data.query1 do
-  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(makequery('auth',' ',2));
+    Execute;
+    First;
+    while not Eof do
+    begin
+      noda:=Fields[0].asinteger;
+      Next;
+    end;
+
     Close;
     SQL.Clear;
     SQL.Add(makequery('basket','c',1));
@@ -219,35 +251,87 @@ begin
       smi:=smi+Fields[0].asinteger;
       Next;
     end;
-    stat_results.Cells[0,1] :=' ';
-    stat_results.Cells[1,1] :='Total';
-    stat_results.Cells[2,1] :=inttostr(scb);
-    stat_results.Cells[3,1] :=inttostr(sci);
-    stat_results.Cells[4,1] :=inttostr(smb);
-    stat_results.Cells[5,1] :=inttostr(smi);
-    if (nod > 0) then
+
+    Close;
+    SQL.Clear;
+    SQL.Add(makequery('auth','c',1));
+    //showmessage(sql.Text);
+    Execute;
+    First;
+    while not Eof do
     begin
-      stat_results.Cells[0,2] :=' ';
-      stat_results.Cells[1,2] :='Average in '+inttostr(nod)+' days';
-      stat_results.Cells[2,2] :=inttostr(scb div nod);
-      stat_results.Cells[3,2] :=inttostr(sci div nod);
-      stat_results.Cells[4,2] :=inttostr(smb div nod);
-      stat_results.Cells[5,2] :=inttostr(smi div nod);
+      update_user_stat(Fields[1].AsInteger, 'auth', 'c', Fields[0].AsInteger);
+      sca:=sca+Fields[0].asinteger;
+      Next;
     end;
-    e:=3;
-    for b:=1 to user_stat_dim do
+
+    Close;
+    SQL.Clear;
+    SQL.Add(makequery('auth','m',1));
+    //showmessage(sql.Text);
+    Execute;
+    First;
+    while not Eof do
     begin
-      if (( user_stat[b].scb <> 0) or (user_stat[b].sci <> 0) or ( user_stat[b].smb <> 0) or (user_stat[b].smi <> 0)) then
-      begin
-        stat_results.Cells[0,e] :=inttostr(e-2);
-        stat_results.Cells[1,e] :=user_stat[b].username;
-        stat_results.Cells[2,e] :=inttostr(user_stat[b].scb);
-        stat_results.Cells[3,e] :=inttostr(user_stat[b].sci);
-        stat_results.Cells[4,e] :=inttostr(user_stat[b].smb);
-        stat_results.Cells[5,e] :=inttostr(user_stat[b].smi);
-        x := stat_results.CellRect(2,e);
-        e:=e+1;
-      end;
+      update_user_stat(Fields[1].AsInteger, 'auth', 'm', Fields[0].AsInteger);
+      sma:=sma+Fields[0].asinteger;
+      Next;
+    end;
+
+  end;
+
+  stat_results.Cells[0,1] :=' ';
+  stat_results.Cells[1,1] :='Total';
+  stat_results.Cells[2,1] :=inttostr(scb);
+  stat_results.Cells[3,1] :=inttostr(sci);
+  stat_results.Cells[4,1] :=inttostr(smb);
+  stat_results.Cells[5,1] :=inttostr(smi);
+  stat_results.Cells[6,1] :=inttostr(sca);
+  stat_results.Cells[7,1] :=inttostr(sma);
+
+  stat_results.Cells[0,2] :=' ';
+  stat_results.Cells[1,2] :='Average in b:'+inttostr(nod)+'/a:'+inttostr(noda)+' days';
+  if (nod > 0) then
+  begin
+    stat_results.Cells[2,2] :=inttostr(scb div nod);
+    stat_results.Cells[3,2] :=inttostr(sci div nod);
+    stat_results.Cells[4,2] :=inttostr(smb div nod);
+    stat_results.Cells[5,2] :=inttostr(smi div nod);
+  end
+  else
+  begin
+    stat_results.Cells[2,2] :='-';
+    stat_results.Cells[3,2] :='-';
+    stat_results.Cells[4,2] :='-';
+    stat_results.Cells[5,2] :='-';
+  end;
+
+  if (noda > 0) then
+  begin
+    stat_results.Cells[6,2] :=inttostr(sca div noda);
+    stat_results.Cells[7,2] :=inttostr(sma div noda);
+  end
+  else
+  begin
+    stat_results.Cells[6,2] :='-';
+    stat_results.Cells[7,2] :='-';
+  end;
+
+  e:=3;
+  for b:=1 to user_stat_dim do
+  begin
+    if (( user_stat[b].scb <> 0) or (user_stat[b].sci <> 0) or ( user_stat[b].smb <> 0) or (user_stat[b].smi <> 0)) then
+    begin
+      stat_results.Cells[0,e] :=inttostr(e-2);
+      stat_results.Cells[1,e] :=user_stat[b].username;
+      stat_results.Cells[2,e] :=inttostr(user_stat[b].scb);
+      stat_results.Cells[3,e] :=inttostr(user_stat[b].sci);
+      stat_results.Cells[4,e] :=inttostr(user_stat[b].smb);
+      stat_results.Cells[5,e] :=inttostr(user_stat[b].smi);
+      stat_results.Cells[6,e] :=inttostr(user_stat[b].sca);
+      stat_results.Cells[7,e] :=inttostr(user_stat[b].sma);
+      x := stat_results.CellRect(2,e);
+      e:=e+1;
     end;
   end;
   bitbtn2.Enabled := true;
@@ -260,10 +344,12 @@ begin
     Clear_String_Grid(stat_results);
     stat_results.Cells[0,0] := '#';
     stat_results.Cells[1,0] := 'UserName';
-    stat_results.Cells[2,0] := 'Bibliographic New';
+    stat_results.Cells[2,0] := 'Bib. New';
     stat_results.Cells[3,0] := 'Items New';
-    stat_results.Cells[4,0] := 'Bibliographic Modified';
+    stat_results.Cells[4,0] := 'Bib. Modified';
     stat_results.Cells[5,0] := 'Items Modified';
+    stat_results.Cells[6,0] := 'Auth. New';
+    stat_results.Cells[7,0] := 'Auth Modified';
     bitbtn2.Enabled := false;
 end;
 
@@ -320,14 +406,14 @@ begin
     Display(stat_results, stat_results.Cells[ACol, ARow], taCenter, CLBLUE, bgcolor)
  else if ARow in  [1..2] then
  begin
-    if ACol in [2..5] then
+    if ACol in [2..7] then
        Display(stat_results, stat_results.Cells[ACol, ARow], taRightJustify, ClRed, bgcolor)
     else
        Display(stat_results, stat_results.Cells[ACol, ARow], taLeftJustify, ClRed,bgcolor)
  end
  else
  begin
-   if ACol in [2..5] then
+   if ACol in [2..7] then
       Display(stat_results, stat_results.Cells[ACol, ARow], taRightJustify, ClGreen,bgcolor)
    else
       Display(stat_results, stat_results.Cells[ACol, ARow], taLeftJustify, ClOlive,bgcolor);
