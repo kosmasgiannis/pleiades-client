@@ -320,7 +320,7 @@ begin
   e:=3;
   for b:=1 to user_stat_dim do
   begin
-    if (( user_stat[b].scb <> 0) or (user_stat[b].sci <> 0) or ( user_stat[b].smb <> 0) or (user_stat[b].smi <> 0)) then
+    if (( user_stat[b].scb <> 0) or (user_stat[b].sci <> 0) or ( user_stat[b].smb <> 0) or (user_stat[b].smi <> 0) or ( user_stat[b].sca <> 0) or ( user_stat[b].sma <> 0) ) then
     begin
       stat_results.Cells[0,e] :=inttostr(e-2);
       stat_results.Cells[1,e] :=user_stat[b].username;
