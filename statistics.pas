@@ -21,9 +21,14 @@ type
       Rect: TRect; State: TGridDrawState);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure BitBtn2Click(Sender: TObject);
+    procedure stat_resultsMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
     function makequery(tab, cmtype:string; which : integer):string;
+    procedure show_stats();
   public
     { Public declarations }
   end;
@@ -38,6 +43,9 @@ var
   statisticsForm: TstatisticsForm;
   user_stat : array[1..256] of stat_rec;
   user_stat_dim : integer;
+  MouseCell : TPoint;
+  statList : TList;
+  statorder : integer;
 implementation
 
 uses DataUnit, MainUnit, utility;
@@ -47,6 +55,7 @@ uses DataUnit, MainUnit, utility;
 function load_users:integer;
 var b:integer;
 begin
+  statList.Clear;
   b:=0;
   with data.query1 do
   begin
@@ -66,6 +75,7 @@ begin
       user_stat[b].smi:=0;
       user_stat[b].sca:=0;
       user_stat[b].sma:=0;
+      statList.Add(@user_stat[b]);
       Next;
     end;
   end;
@@ -165,10 +175,10 @@ begin
 end;
 
 procedure TstatisticsForm.BitBtn1Click(Sender: TObject);
-var  nod, noda, sca, sma, scb,sci, smb, smi, b, e : integer;
-x : TRect;
+var  nod, noda, sca, sma, scb,sci, smb, smi : integer;
 begin
   Clear_String_Grid(stat_results);
+  statorder := 0;
   load_users;
   scb:=0;
   sci:=0;
@@ -317,24 +327,102 @@ begin
     stat_results.Cells[7,2] :='-';
   end;
 
+  show_stats;
+
+  bitbtn2.Enabled := true;
+end;
+
+function cmpnames(i1, i2: Pointer) : Integer;
+var v1,v2 : ^stat_rec;
+begin
+  v1 := i1;
+  v2 := i2;
+  Result := CompareText(v1.username, v2.username);
+end;
+
+function cmpscb(i1, i2: Pointer) : Integer;
+var v1,v2 : ^stat_rec;
+begin
+  v1 := i1;
+  v2 := i2;
+  Result := v2.scb - v1.scb;
+end;
+
+function cmpsci(i1, i2: Pointer) : Integer;
+var v1,v2 : ^stat_rec;
+begin
+  v1 := i1;
+  v2 := i2;
+  Result := v2.sci - v1.sci;
+end;
+
+function cmpsmb(i1, i2: Pointer) : Integer;
+var v1,v2 : ^stat_rec;
+begin
+  v1 := i1;
+  v2 := i2;
+  Result := v2.smb - v1.smb;
+end;
+
+function cmpsmi(i1, i2: Pointer) : Integer;
+var v1,v2 : ^stat_rec;
+begin
+  v1 := i1;
+  v2 := i2;
+  Result := v2.smi - v1.smi;
+end;
+
+function cmpsca(i1, i2: Pointer) : Integer;
+var v1,v2 : ^stat_rec;
+begin
+  v1 := i1;
+  v2 := i2;
+  Result := v2.sca - v1.sca;
+end;
+
+function cmpsma(i1, i2: Pointer) : Integer;
+var v1,v2 : ^stat_rec;
+begin
+  v1 := i1;
+  v2 := i2;
+  Result := v2.sma - v1.sma;
+end;
+
+procedure TstatisticsForm.show_stats;
+var  b, e : integer;
+x : TRect;
+v : ^stat_rec;
+begin
+  case statorder of
+   2 : statList.Sort(cmpscb);
+   3 : statList.Sort(cmpsci);
+   4 : statList.Sort(cmpsmb);
+   5 : statList.Sort(cmpsmi);
+   6 : statList.Sort(cmpsca);
+   7 : statList.Sort(cmpsma);
+  else
+    statList.Sort(cmpnames);
+  end;
+
+
   e:=3;
-  for b:=1 to user_stat_dim do
+  for b:=0 to statList.Count-1 do
   begin
-    if (( user_stat[b].scb <> 0) or (user_stat[b].sci <> 0) or ( user_stat[b].smb <> 0) or (user_stat[b].smi <> 0) or ( user_stat[b].sca <> 0) or ( user_stat[b].sma <> 0) ) then
+    v := statList.Items[b];
+    if (( v.scb <> 0) or (v.sci <> 0) or ( v.smb <> 0) or (v.smi <> 0) or ( v.sca <> 0) or ( v.sma <> 0) ) then
     begin
       stat_results.Cells[0,e] :=inttostr(e-2);
-      stat_results.Cells[1,e] :=user_stat[b].username;
-      stat_results.Cells[2,e] :=inttostr(user_stat[b].scb);
-      stat_results.Cells[3,e] :=inttostr(user_stat[b].sci);
-      stat_results.Cells[4,e] :=inttostr(user_stat[b].smb);
-      stat_results.Cells[5,e] :=inttostr(user_stat[b].smi);
-      stat_results.Cells[6,e] :=inttostr(user_stat[b].sca);
-      stat_results.Cells[7,e] :=inttostr(user_stat[b].sma);
+      stat_results.Cells[1,e] :=v.username;
+      stat_results.Cells[2,e] :=inttostr(v.scb);
+      stat_results.Cells[3,e] :=inttostr(v.sci);
+      stat_results.Cells[4,e] :=inttostr(v.smb);
+      stat_results.Cells[5,e] :=inttostr(v.smi);
+      stat_results.Cells[6,e] :=inttostr(v.sca);
+      stat_results.Cells[7,e] :=inttostr(v.sma);
       x := stat_results.CellRect(2,e);
       e:=e+1;
     end;
   end;
-  bitbtn2.Enabled := true;
 end;
 
 procedure TstatisticsForm.FormActivate(Sender: TObject);
@@ -441,6 +529,33 @@ begin
       CloseFile(F);
     end;
   end;
+end;
+
+procedure TstatisticsForm.stat_resultsMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  ARow, ACol : integer;
+begin
+  with stat_results do begin
+    {get mouse cell indices}
+    MouseToCell(X, Y, ACol, ARow);
+    MouseCell := Point(ACol, ARow);
+  end;
+  if (ARow = 0) then
+  begin
+   statorder := ACol;
+   show_stats;
+  end;
+end;
+
+procedure TstatisticsForm.FormCreate(Sender: TObject);
+begin
+ statList := tlist.Create;
+end;
+
+procedure TstatisticsForm.FormDestroy(Sender: TObject);
+begin
+  statList.Destroy;
 end;
 
 end.

@@ -1,6 +1,6 @@
 object statisticsForm: TstatisticsForm
-  Left = 141
-  Top = 141
+  Left = 213
+  Top = 149
   Width = 1043
   Height = 640
   Caption = 'Statistics'
@@ -13,6 +13,8 @@ object statisticsForm: TstatisticsForm
   KeyPreview = True
   OldCreateOrder = False
   OnActivate = FormActivate
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnKeyPress = FormKeyPress
   PixelsPerInch = 96
   TextHeight = 13
@@ -62,6 +64,7 @@ object statisticsForm: TstatisticsForm
     ScrollBars = ssNone
     TabOrder = 0
     OnDrawCell = stat_resultsDrawCell
+    OnMouseDown = stat_resultsMouseDown
     ColWidths = (
       31
       243
