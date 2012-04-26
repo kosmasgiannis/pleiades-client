@@ -14,7 +14,7 @@ object LoginForm: TLoginForm
   Font.Name = 'Arial'
   Font.Style = []
   OldCreateOrder = False
-  Position = poDesktopCenter
+  Position = poDefault
   OnClose = TntFormClose
   OnShow = TntFormShow
   PixelsPerInch = 96

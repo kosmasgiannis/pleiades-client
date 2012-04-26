@@ -35,7 +35,7 @@ var
 implementation
 
 uses
-  DataUnit,  MainUnit;
+  DataUnit,  MainUnit, SplashScrUnit;
 
 {$R *.dfm}
 
@@ -96,6 +96,8 @@ end;
 
 procedure TLoginForm.TntFormShow(Sender: TObject);
 begin
+  LoginForm.Top:=SplashScrForm.Top + SplashScrForm.Height;
+  LoginForm.Left:=(Screen.Width - LoginForm.Width) div 2;
   LoginForm.Caption := 'Login - '+data.MyConnection1.Database;
   edit1.Text:='';
   edit2.Text:='';

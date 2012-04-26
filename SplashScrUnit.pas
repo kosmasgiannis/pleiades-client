@@ -40,7 +40,7 @@ end;
 procedure TSplashScrForm.FormActivate(Sender: TObject);
 begin
   Label1.Caption := 'Version: '+Appversion;
-
+  SplashScrForm.Top := ((Screen.Height - SplashScrForm.Height - LoginForm.Height) div 2 ) ;
   Application.ProcessMessages;
   if not FromAbout then
   begin
