@@ -132,7 +132,7 @@ function extract_fields(s : string; f: string; delim : char) : string; overload;
 function extract_fields(s : string; f: string) : string; overload;
 
 function makemrcfromnew : UTF8String;
-function makenewauthmrc : UTF8String;
+function makenewauthmrc(tag : string; heading_text: Widestring) : UTF8String;
 procedure adddirentry(var dir : UTF8String; tag : string; len, pos : integer);
 function MakeMRCFromBasket(var resrec : UTF8String) :integer; overload;
 function MakeMRCFromBasket : UTF8String; overload;
@@ -3425,9 +3425,9 @@ begin
   ShortDateFormat := TempDateFormat;
 end;
 
-function makenewauthmrc : UTF8String;
+function makenewauthmrc(tag : string; heading_text: Widestring) : UTF8String;
 var
-  hlp,junk, marcrec, dir, leader, f008 : UTF8String;
+  hlp,junk, marcrec, dir, leader, f008, heading: UTF8String;
   dirpos, i : integer;
   f001, curdate, TempDateFormat : string;
 begin
@@ -3437,13 +3437,16 @@ begin
   marcrec := '';
   f001:=inttostr(data.auth.FieldByName('recno').AsInteger)+#30;
   f008:= curdate+' | |||||||||||||||||||||||||||||||'+#30;
+  heading := '  '+#31+'a'+WideStringToUTF8String(heading_text)+#30;
   leader:='00000nz  a22.....n  4500';
   dir:='';
   dirpos := 0;
-  marcrec:=f001+f008;
+  marcrec:=f001+f008+heading;
   adddirentry(dir,'001',length(f001),dirpos);
   dirpos := dirpos+length(f001);
   adddirentry(dir,'008',length(f008),dirpos);
+  dirpos := dirpos+length(f008);
+  adddirentry(dir,tag,length(heading),dirpos);
 
   marcrec:=leader+dir+#30+marcrec+#29;
   hlp:=leader+dir+#30;

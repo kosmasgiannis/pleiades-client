@@ -1552,7 +1552,7 @@ begin
     with data.auth do
     begin
       EditTable(data.auth);
-      temp := makenewauthmrc;
+      temp := makenewauthmrc('1XX','');
       if length(temp) >= 10 then temp[10] := 'a';
       EnhanceMARC(gotoauthrecno, temp);
       GetBlob('text').IsUnicode := True;
