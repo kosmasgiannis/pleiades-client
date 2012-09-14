@@ -358,9 +358,9 @@ end;
 
 procedure Tzauthlookupform.lookupbuttonClick(Sender: TObject);
 var
-  querystring, q1, q2, s1, t1 : WideString;
+  querystring, q1, q2, t1 : WideString;
   error : WideString;
-  i, pp, itidx : integer;
+  i, itidx : integer;
   name, junk : string;
   myinifname2, path : string;
   myinifile2 : TIniFile;
@@ -410,54 +410,35 @@ begin
    myinifile2.free;
    querystring := '';
    error:='';
-   s1:='';
-   for pp:=1 to MAXSEARCHFIELDS do
-   begin
-    if (FindComponent('term'+IntToStr(pp)) <> nil) then
-    begin
-     if (TTntEdit(FindComponent('term'+IntToStr(pp))).Text <> '') then
-     begin
-      if (querystring<>'') then querystring:=s1+querystring; // add previous valid boolean operator.
 
-      q1:=squeeze(TTntEdit(FindComponent('term'+IntToStr(pp))).Text);
-      t1:='';
-      if (TCheckBox(FindComponent('truncationcheckbox'+IntToStr(pp))).Checked) then
-       t1 := ' @attr 5=1';
-      if (FindComponent('fieldscombobox'+IntToStr(pp)) <> nil) then
-      begin
-        itidx:=TComboBox(FindComponent('fieldscombobox'+IntToStr(pp))).ItemIndex;
-        q2:=copy(zcmdkeys[itidx],1,pos('=',zcmdkeys[itidx])-1);
-        if cmds.indexofname(q2) <> -1 then
-         q2:=cmds.ValueFromIndex[cmds.indexofname(q2)]
-        else
-        begin
-         querystring := '';
-         break;
-        end;
-      end;
-      // If no attr for word/phrase etc searching is specified,
-      // specify 4=1 if it is a single word or
-      // 4=6 if there are more than one words in the search term.
-      if (pos('@attr 4=',q2)<=0) then
-      begin
-        q1:=remove_punctuation(q1);
-        if (pos(' ',q1) > 0) then
-         q2:=q2+' @attr 4=6'
-        else
-         q2:=q2+' @attr 4=1';
-      end;
-      q1:=q2+t1+' "'+q1+'"';
-      if (FindComponent('opscombobox'+IntToStr(pp)) <> nil) then
-      begin
-        itidx:=TComboBox(FindComponent('opscombobox'+IntToStr(pp))).ItemIndex;
-        if itidx=0 then s1:='@and '
-        else if itidx=1 then s1:='@or '
-        else if itidx=2 then s1:='@not ';
-      end;
-      querystring:=querystring+' '+q1;
+   if (term1.Text <> '') then
+   begin
+    q1:=squeeze(term1.Text);
+    t1:='';
+    if (truncationcheckbox1.Checked) then
+     t1 := ' @attr 5=1';
+     itidx:=fieldscombobox1.ItemIndex;
+     q2:=copy(zcmdkeys[itidx],1,pos('=',zcmdkeys[itidx])-1);
+     if (cmds.indexofname(q2) <> -1) then
+     begin
+       q2:=cmds.ValueFromIndex[cmds.indexofname(q2)];
+       if (pos('@attr 4=',q2)<=0) then
+       begin
+         q1:=remove_punctuation(q1);
+         if (pos(' ',q1) > 0) then
+          q2:=q2+' @attr 4=6'
+         else
+          q2:=q2+' @attr 4=1';
+       end;
+       q1:=q2+t1+' "'+q1+'"';
+       querystring:=q1;
+     end
+     else
+     begin
+       ShowMessage('error');
+       querystring := '';
      end;
-    end;  // term exist
-   end;  //for
+   end;
    cmds.Free;
 // Query is ready
 {}
@@ -546,7 +527,6 @@ end;
 
 procedure Tzauthlookupform.cancelbuttonClick(Sender: TObject);
 begin
-// zcmdkeys.Free;
  close;
 end;
 
