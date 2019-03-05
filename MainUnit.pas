@@ -13,8 +13,8 @@ uses
 
 const
   AppName_ = 'Pleiades';
-  AppVersion_ = '2.2.24';         // Change this immediately after the new version is released.
-  AppReleaseDate_ = '2011-03-09'; // Change this just before the new version is about to be released.
+  AppVersion_ = '2.2.25';         // Change this immediately after the new version is released.
+  AppReleaseDate_ = '2019-03-05'; // Change this just before the new version is about to be released.
 
 type
   TFastRecordCreator = class(TForm)
