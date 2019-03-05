@@ -206,6 +206,7 @@ procedure FixHollis(recmemo : TTntMemo);
 
 function get_max_hold_aa(recno : integer) : integer;
 procedure MoveHoldingUpDown(direction : string; recno, holdon, aa : integer);
+procedure MoveHoldingUpDown2(direction: string; recno, aa : integer);
 
 const
  LC_BOOK    = 'aa,ac,ad,am,ta,tc,td,tm';
@@ -4867,7 +4868,7 @@ r h aa
 1 2 2
 
 up
-UPDATE hold SET aa = :aa WHERE recno = :recno AND aa = :aa;
+UPDATE hold SET aa = :aa WHERE recno = :recno AND aa = :aa-1;
 UPDATE hold SET aa = aa - 1 WHERE recno = :recno AND holdon = :holdon;
 
 down
@@ -4898,5 +4899,40 @@ UPDATE hold SET aa = aa + 1 WHERE recno = :recno AND holdon = :holdon;
 
 end;
 
+procedure MoveHoldingUpDown2(direction: string; recno, aa : integer);
+var q0, q1, q2 : string;
+begin
+  if (direction = 'up') then
+  begin
+    q0 := 'UPDATE hold SET aa = -1 WHERE recno = '+inttostr(recno)+' AND aa = '+inttostr(aa);
+    q1 := 'UPDATE hold SET aa = '+inttostr(aa)+' WHERE recno = '+inttostr(recno)+' AND aa = '+inttostr(aa-1);
+    q2 := 'UPDATE hold SET aa = '+inttostr(aa-1)+' WHERE recno = '+inttostr(recno)+' AND aa = -1';
+  end
+  else
+  begin
+    q0 := 'UPDATE hold SET aa = -1 WHERE recno = '+inttostr(recno)+' AND aa = '+inttostr(aa);
+    q1 := 'UPDATE hold SET aa = '+inttostr(aa)+' WHERE recno = '+inttostr(recno)+' AND aa = '+inttostr(aa+1);
+    q2 := 'UPDATE hold SET aa = '+inttostr(aa+1)+' WHERE recno = '+inttostr(recno)+' AND aa = -1';
+  end;
+ { ShowMessage(q0);
+  ShowMessage(q1);
+  ShowMessage(q2);
+  }
+  data.Query1.Close;
+  data.Query1.SQL.Clear;
+  data.Query1.SQL.Add(q0);
+  data.Query1.Execute;
+
+  data.Query1.Close;
+  data.Query1.SQL.Clear;
+  data.Query1.SQL.Add(q1);
+  data.Query1.Execute;
+
+  data.Query1.Close;
+  data.Query1.SQL.Clear;
+  data.Query1.SQL.Add(q2);
+  data.Query1.Execute;
+  
+end;
 end.
 

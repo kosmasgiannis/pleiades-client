@@ -77,6 +77,7 @@ type
     nextrec: TTntBitBtn;
     TntBitBtn4: TTntBitBtn;
     AuthorityLookup1: TTntMenuItem;
+    TntBitBtn8: TTntBitBtn;
     procedure Return1Click(Sender: TObject);
     procedure Save1Click(Sender: TObject);
     procedure Delete1Click(Sender: TObject);
@@ -94,8 +95,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure TntRichEditMEMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
-    procedure TntRichEditMEMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
     procedure MakeReadOnly;
     procedure MakeEdit;
 
@@ -118,6 +117,9 @@ type
     procedure nextrecClick(Sender: TObject);
     procedure TntBitBtn4Click(Sender: TObject);
     procedure AuthorityLookup1Click(Sender: TObject);
+    procedure TntRichEditMEMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure TntBitBtn8Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -147,7 +149,8 @@ uses zoomit, form008, MyAccess, ldr, MainUnit, DataUnit,  Math, EditMarcUnit,
   StrUtils, WideIniClass, ProgresBarUnit, utility,
   GlobalProcedures, HoldingsUnit, ShowHoldMemoUnit, DigitalUnit, zlocate,
   HoldingsRangeUnit,
-  zauthlookup;
+  zauthlookup,
+  MoveHoldings;
 
 {$R *.dfm}
 
@@ -1035,7 +1038,7 @@ begin
   marceditorform.SetHoldInRichEdit(RichEdit);
 end;
 
-procedure TMARCEditorform.TntRichEditMEMouseDown(Sender: TObject;
+procedure TMARCEditorform.TntRichEditMEMouseUp(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   Pt : TPoint;
@@ -1420,6 +1423,16 @@ begin
    end;
 
  end;
+end;
+
+procedure TMARCEditorform.TntBitBtn8Click(Sender: TObject);
+begin
+  MoveHoldingsForm.maxhold := Data.hold.RecordCount;
+  MoveHoldingsForm.recno := myrecno;
+  MoveHoldingsForm.ShowModal;
+  holdings_moved := true;
+  SendMessage(TntRichEditME.Handle, EM_LINESCROLL, 0, 0);
+  Refresh_Holdings(marceditorform.TntRichEditME);
 end;
 
 end.

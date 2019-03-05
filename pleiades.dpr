@@ -76,7 +76,8 @@ uses
   md5 in 'MD5.pas',
   statistics in 'statistics.pas' {statisticsForm},
   HoldingsRangeUnit in 'HoldingsRangeUnit.pas' {HoldingsRange: TTntForm},
-  ReplaceMARCrecs in 'ReplaceMARCrecs.pas' {ReplaceMARCrecords};
+  ReplaceMARCrecs in 'ReplaceMARCrecs.pas' {ReplaceMARCrecords},
+  MoveHoldings in 'MoveHoldings.pas' {MoveHoldingsForm};
 
 {$R *.res}
 
@@ -150,5 +151,6 @@ begin
   Application.CreateForm(TstatisticsForm, statisticsForm);
   Application.CreateForm(THoldingsRange, HoldingsRange);
   Application.CreateForm(TReplaceMARCrecords, ReplaceMARCrecords);
+  Application.CreateForm(TMoveHoldingsForm, MoveHoldingsForm);
   Application.Run;
 end.
