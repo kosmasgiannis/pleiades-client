@@ -13,7 +13,7 @@ uses
 
 const
   AppName_ = 'Pleiades';
-  AppVersion_ = '2.2.25';         // Change this immediately after the new version is released.
+  AppVersion_ = '2.2.26-pre';         // Change this immediately after the new version is released.
   AppReleaseDate_ = '2019-03-05'; // Change this just before the new version is about to be released.
 
 type
